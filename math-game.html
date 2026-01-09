@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Master | Virtual Ventures</title>
+    <style>
+        /* FULL SCREEN FIX - NO SCROLL */
+        body, html { height: 100%; overflow: hidden; margin: 0; background: #020617; color: #fff; font-family: 'Kanit', sans-serif; }
+
+        .game-wrapper {
+            display: flex; flex-direction: column; height: 100vh; width: 100%;
+            padding-bottom: 100px; /* Space for Footer */
+            box-sizing: border-box;
+        }
+
+        /* Top Ad Banner */
+        .ad-space {
+            width: 90%; height: 50px; background: rgba(30, 41, 59, 0.4);
+            margin: 10px auto; border-radius: 12px; border: 1px dashed #475569;
+            display: flex; align-items: center; justify-content: center;
+            color: #64748b; font-size: 0.7rem; flex-shrink: 0;
+        }
+
+        /* Back Button */
+        .back-nav { padding: 5px 15px; flex-shrink: 0; }
+        .btn-back {
+            width: 40px; height: 40px; background: rgba(30, 41, 59, 0.8);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #fbbf24; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* MAIN GAME AREA - PUSHED UP */
+        .game-container {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; 
+            justify-content: flex-start; /* Start from top instead of center */
+            padding: 20px 20px 0 20px;
+            margin-top: -10px; /* Lift it up */
+        }
+
+        .stats-bar { display: flex; gap: 15px; margin-bottom: 15px; }
+        .badge {
+            background: rgba(251, 191, 36, 0.1); color: #fbbf24;
+            padding: 5px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 900;
+        }
+
+        .timer-box { font-size: 1.3rem; font-weight: 900; color: #ef4444; margin-bottom: 15px; }
+
+        .question-card {
+            background: #1e293b; width: 100%; max-width: 280px;
+            padding: 25px 15px; border-radius: 25px; text-align: center;
+            border: 1px solid rgba(251, 191, 36, 0.3); margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        #question { font-size: 3rem; font-weight: 900; color: #fff; margin: 0; letter-spacing: 2px; }
+
+        .answer-input {
+            width: 60%; max-width: 180px; background: #0f172a; border: 2px solid #334155;
+            padding: 12px; border-radius: 15px; color: #fff; font-size: 1.5rem;
+            text-align: center; margin-bottom: 20px; font-family: 'Kanit';
+        }
+        .answer-input:focus { border-color: #fbbf24; outline: none; }
+
+        .submit-btn {
+            width: 80%; max-width: 250px; padding: 16px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000; border: none; border-radius: 15px; font-weight: 900;
+            font-size: 1rem; cursor: pointer; text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.2);
+        }
+        .submit-btn:disabled { opacity: 0.4; filter: grayscale(1); }
+    </style>
+</head>
+<body>
+
+    <div class="game-wrapper">
+        <div class="ad-space">ADVERTISEMENT BANNER</div>
+
+        <div class="back-nav"><div class="btn-back" onclick="history.back()">❮</div></div>
+
+        <main class="game-container" id="gameMain">
+            <div class="stats-bar">
+                <div class="badge">LIMIT: <span id="limitDisplay">10</span></div>
+                <div class="badge">REWARD: 🟡 10</div>
+            </div>
+
+            <div class="timer-box">⏱ <span id="timer">10</span>s</div>
+
+            <div class="question-card">
+                <p id="question">? + ?</p>
+            </div>
+
+            <input type="number" id="userAnswer" class="answer-input" placeholder="?" inputmode="numeric">
+            
+            <button id="submitBtn" class="submit-btn" onclick="checkAnswer()">SUBMIT ANSWER</button>
+        </main>
+    </div>
+
+    <script src="settings.js"></script>
+
+    <script>
+        let currentAns = 0;
+        let timeLeft = 10;
+        let timerInterval;
+        const DAILY_LIMIT = 10;
+
+        const today = new Date().toLocaleDateString();
+        let questionsDone = Number(localStorage.getItem('vv_math_done')) || 0;
+        let lastDate = localStorage.getItem('vv_math_date');
+
+        if(lastDate !== today) {
+            questionsDone = 0;
+            localStorage.setItem('vv_math_done', 0);
+            localStorage.setItem('vv_math_date', today);
+        }
+
+        function updateUI() {
+            document.getElementById('limitDisplay').innerText = DAILY_LIMIT - questionsDone;
+            if(questionsDone >= DAILY_LIMIT) {
+                document.getElementById('gameMain').innerHTML = `
+                    <div style="text-align:center; margin-top:50px;">
+                        <h2 style='color:#fbbf24'>LIMIT REACHED!</h2>
+                        <p style='color:#94a3b8'>Daily quota finished. Come back tomorrow!</p>
+                        <button class="submit-btn" onclick="history.back()" style="margin-top:20px; width:auto; padding:10px 30px;">GO BACK</button>
+                    </div>`;
+            }
+        }
+
+        function generateQuestion() {
+            if(questionsDone >= DAILY_LIMIT) return;
+            
+            const num1 = Math.floor(Math.random() * 20) + 2;
+            const num2 = Math.floor(Math.random() * 15) + 1;
+            const isPlus = Math.random() > 0.5;
+
+            if(isPlus) {
+                currentAns = num1 + num2;
+                document.getElementById('question').innerText = `${num1} + ${num2}`;
+            } else {
+                const high = Math.max(num1, num2);
+                const low = Math.min(num1, num2);
+                currentAns = high - low;
+                document.getElementById('question').innerText = `${high} - ${low}`;
+            }
+            
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 10;
+            document.getElementById('timer').innerText = timeLeft;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Time's Up! ⏱");
+                    processNext();
+                }
+            }, 1000);
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('userAnswer');
+            const userVal = parseInt(input.value);
+            if(input.value === "") return;
+
+            clearInterval(timerInterval);
+            
+            if(userVal === currentAns) {
+                let coins = Number(localStorage.getItem('vv_coins')) || 0;
+                localStorage.setItem('vv_coins', coins + 10);
+                alert("Correct! 🟡 +10 Coins");
+            } else {
+                alert("Wrong! The answer was " + currentAns);
+            }
+
+            processNext();
+        }
+
+        function processNext() {
+            questionsDone++;
+            localStorage.setItem('vv_math_done', questionsDone);
+            location.reload();
+        }
+
+        // Auto-focus input on load
+        window.onload = () => {
+            if(questionsDone < DAILY_LIMIT) {
+                document.getElementById('userAnswer').focus();
+            }
+        };
+
+        updateUI();
+        generateQuestion();
+    </script>
+</body>
+</html>

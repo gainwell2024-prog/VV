@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lucky Dice | Virtual Ventures</title>
+    <style>
+        /* FULL SCREEN FIX */
+        body, html { height: 100%; overflow: hidden; margin: 0; }
+
+        .dice-wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+            padding-bottom: 90px; /* FOOTER KE LIYE SAFE SPACE */
+            box-sizing: border-box;
+        }
+
+        .ad-space {
+            width: 90%; height: 50px;
+            background: rgba(30, 41, 59, 0.4);
+            margin: 10px auto; border-radius: 12px;
+            border: 1px dashed #475569;
+            display: flex; align-items: center; justify-content: center;
+            color: #64748b; font-size: 0.7rem; flex-shrink: 0;
+        }
+
+        .back-nav { padding: 5px 15px; flex-shrink: 0; }
+        .btn-back {
+            width: 40px; height: 40px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fbbf24; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Isko flex-start kiya taaki upar rahe, niche nahi */
+        .game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center hi rakha hai but wrapper padding se lift ho jayega */
+            padding: 0 20px;
+        }
+        
+        .rolls-left {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24; padding: 6px 18px;
+            border-radius: 20px; font-size: 0.8rem;
+            font-weight: 900; margin-bottom: 25px;
+        }
+
+        .dice-box {
+            width: 110px; height: 110px; background: #fff; border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 4.5rem; color: #1e293b; margin-bottom: 15px;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
+        }
+
+        .roll-btn {
+            width: 80%; max-width: 250px;
+            padding: 16px; background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000; border: none; border-radius: 15px; font-weight: 900;
+            font-size: 1rem; cursor: pointer; font-family: 'Kanit';
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+        
+        .roll-btn:disabled { opacity: 0.4; filter: grayscale(1); }
+
+        .result-text { margin-top: 15px; font-size: 1.2rem; font-weight: 900; min-height: 2rem; }
+        
+        .rolling { animation: rollAnim 0.1s infinite; }
+        @keyframes rollAnim {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(10deg); }
+            100% { transform: rotate(-10deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dice-wrapper">
+        
+        <div class="ad-space">ADVERTISEMENT BANNER</div>
+
+        <div class="back-nav">
+            <div class="btn-back" onclick="history.back()">❮</div>
+        </div>
+
+        <main class="game-container">
+            <div class="rolls-left">ROLLS LEFT: <span id="rollsDisplay">10</span></div>
+            
+            <div id="dice" class="dice-box">🎲</div>
+            <div id="result" class="result-text"></div>
+            
+            <button id="rollBtn" class="roll-btn" onclick="rollDice()">ROLL NOW</button>
+        </main>
+
+    </div>
+
+    <script src="settings.js"></script>
+
+    <script>
+        const diceIcons = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+        const DAILY_LIMIT = 10;
+        
+        const today = new Date().toLocaleDateString();
+        let rollsDone = Number(localStorage.getItem('vv_dice_rolls')) || 0;
+        let lastDate = localStorage.getItem('vv_dice_date');
+
+        if(lastDate !== today) {
+            rollsDone = 0;
+            localStorage.setItem('vv_dice_rolls', 0);
+            localStorage.setItem('vv_dice_date', today);
+        }
+
+        function updateRollsUI() {
+            document.getElementById('rollsDisplay').innerText = DAILY_LIMIT - rollsDone;
+            if(rollsDone >= DAILY_LIMIT) {
+                document.getElementById('rollBtn').disabled = true;
+                document.getElementById('rollBtn').innerText = "LIMIT REACHED";
+            }
+        }
+
+        function rollDice() {
+            if(rollsDone >= DAILY_LIMIT) return;
+            const dice = document.getElementById('dice');
+            const btn = document.getElementById('rollBtn');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            dice.classList.add('rolling');
+
+            setTimeout(() => {
+                dice.classList.remove('rolling');
+                const rollValue = Math.floor(Math.random() * 6) + 1;
+                dice.innerText = diceIcons[rollValue - 1];
+                
+                let winAmount = 0;
+                if(rollValue <= 3) winAmount = 10 + Math.floor(Math.random() * 11);
+                else if(rollValue <= 5) winAmount = 25 + Math.floor(Math.random() * 11);
+                else winAmount = 50;
+
+                rollsDone++;
+                localStorage.setItem('vv_dice_rolls', rollsDone);
+                
+                let coins = Number(localStorage.getItem('vv_coins')) || 0;
+                localStorage.setItem('vv_coins', coins + winAmount);
+                
+                result.innerHTML = `<span style="color:#fbbf24;">+${winAmount} COINS</span>`;
+                updateRollsUI();
+                
+                if(rollsDone < DAILY_LIMIT) btn.disabled = false;
+            }, 800);
+        }
+
+        updateRollsUI();
+    </script>
+</body>
+</html>

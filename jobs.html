@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Earn More | Virtual Ventures</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body, html { height: 100%; margin: 0; background: #020617; color: #fff; font-family: 'Kanit', sans-serif; overflow: hidden; }
+        
+        .jobs-wrapper { 
+            display: flex; flex-direction: column; height: 100vh; width: 100%; 
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.85), rgba(2, 6, 23, 0.98)), 
+                              url('background-image.png'); 
+            background-size: cover; background-position: center;
+        }
+
+        /* EXTRA SCROLL SPACE: padding-bottom increased to 250px */
+        .content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 250px; scroll-behavior: smooth; }
+
+        .ad-banner {
+            width: 100%; height: 65px;
+            background: rgba(30, 41, 59, 0.6);
+            margin-bottom: 25px; border-radius: 18px;
+            border: 1px dashed #fbbf24;
+            display: flex; align-items: center; justify-content: center;
+            color: #94a3b8; font-size: 0.75rem; backdrop-filter: blur(10px);
+            font-weight: 700; letter-spacing: 1px;
+        }
+
+        .section-title { font-size: 1.5rem; font-weight: 900; letter-spacing: 1.5px; color: #fbbf24; margin: 10px 0 20px 5px; text-transform: uppercase; font-style: italic; }
+
+        .job-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(251, 191, 36, 0.1);
+            border-radius: 24px; padding: 20px;
+            display: flex; align-items: center;
+            margin-bottom: 15px; gap: 15px;
+            backdrop-filter: blur(15px);
+        }
+
+        .job-icon { font-size: 2.5rem; width: 60px; text-align: center; }
+        .job-details { flex: 1; }
+        .job-details h3 { font-size: 1.1rem; color: #fff; margin: 0; font-weight: 700; }
+        .reward-info { color: #fbbf24; font-size: 0.85rem; font-weight: 900; margin-top: 4px; display: block; }
+
+        .play-btn {
+            background: #fbbf24; color: #000; border: none;
+            padding: 12px 22px; border-radius: 14px;
+            font-weight: 900; font-size: 0.85rem; cursor: pointer;
+            box-shadow: 0 4px 0 #b48a1d;
+            font-family: 'Kanit';
+            text-transform: uppercase;
+        }
+        .play-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #b48a1d; }
+
+        /* AD OVERLAY SYSTEM */
+        #videoOverlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: radial-gradient(circle, #1e293b, #020617);
+            z-index: 10000; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+        }
+        .loader-ring { width: 80px; height: 80px; border: 5px solid rgba(251, 191, 36, 0.1); border-top: 5px solid #fbbf24; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="jobs-wrapper">
+        <main class="content">
+            <div class="ad-banner">PREMIUM AD PLACEMENT</div>
+
+            <h2 class="section-title">🚀 Side Hustles</h2>
+
+            <div id="jobsList">
+                <div class="job-item">
+                    <div class="job-icon">📺</div>
+                    <div class="job-details">
+                        <h3>Instant Bonus</h3>
+                        <span class="reward-info">REWARD: 🟡 500</span>
+                    </div>
+                    <button class="play-btn" onclick="playWithAd(null, 500)">WATCH</button>
+                </div>
+
+                <div class="job-item">
+                    <div class="job-icon">🎲</div>
+                    <div class="job-details">
+                        <h3>Lucky Dice</h3>
+                        <span class="reward-info">MAX REWARD: 🟡 500</span>
+                    </div>
+                    <button class="play-btn" onclick="playWithAd('dice-game.html')">PLAY</button>
+                </div>
+
+                <div class="job-item">
+                    <div class="job-icon">🧠</div>
+                    <div class="job-details">
+                        <h3>Math Master</h3>
+                        <span class="reward-info">REWARD: 🟡 250 / WIN</span>
+                    </div>
+                    <button class="play-btn" onclick="playWithAd('math-game.html')">PLAY</button>
+                </div>
+
+                <div class="job-item">
+                    <div class="job-icon">🃏</div>
+                    <div class="job-details">
+                        <h3>Memory Match</h3>
+                        <span class="reward-info">REWARD: 🟡 400 / WIN</span>
+                    </div>
+                    <button class="play-btn" onclick="playWithAd('memory-game.html')">PLAY</button>
+                </div>
+
+                <div class="job-item">
+                    <div class="job-icon">🎨</div>
+                    <div class="job-details">
+                        <h3>Color Match</h3>
+                        <span class="reward-info">REWARD: 🟡 SCORE x 1</span>
+                    </div>
+                    <button class="play-btn" onclick="playWithAd('color-game.html')">PLAY</button>
+                </div>
+
+                <div class="job-item">
+                    <div class="job-icon">🔢</div>
+                    <div class="job-details">
+                        <h3>2048 Wealth</h3>
+                        <span class="reward-info">REWARD: 🟡 1000 / WIN</span>
+                    </div>
+                    <button class="play-btn" onclick="playWithAd('game-2048.html')">PLAY</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="videoOverlay">
+        <div class="loader-ring"></div>
+        <h2 id="adStatus" style="color:#fbbf24; font-weight: 900; letter-spacing: 2px;">LOADING AD</h2>
+        <div id="adTimer" style="font-size: 5rem; font-weight: 900; margin: 10px;">5</div>
+        <p style="color:#94a3b8; font-weight: 700; text-transform: uppercase; font-size: 0.7rem;">Connecting to Secure Ad Server...</p>
+    </div>
+
+    <script src="settings.js"></script>
+    <script>
+        function playWithAd(targetUrl, directReward = null) {
+            const overlay = document.getElementById('videoOverlay');
+            const timerText = document.getElementById('adTimer');
+            const statusText = document.getElementById('adStatus');
+            
+            overlay.style.display = 'flex';
+            statusText.innerText = directReward ? "REWARD AD" : "LOADING GAME AD";
+            
+            let timeLeft = 5; // 5 Second Ad
+            timerText.innerText = timeLeft;
+
+            const interval = setInterval(() => {
+                timeLeft--;
+                timerText.innerText = timeLeft;
+                
+                if(timeLeft <= 0) {
+                    clearInterval(interval);
+                    overlay.style.display = 'none';
+                    
+                    if(directReward) {
+                        rewardUser(directReward);
+                    } else if(targetUrl) {
+                        window.location.href = targetUrl;
+                    }
+                }
+            }, 1000);
+        }
+
+        function rewardUser(amount) {
+            let coins = Number(localStorage.getItem('vv_coins')) || 0;
+            localStorage.setItem('vv_coins', coins + amount);
+            alert("Reward Claimed: 🟡 " + amount);
+            location.reload(); 
+        }
+    </script>
+</body>
+</html>

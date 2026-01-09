@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard | Virtual Ventures</title>
+    <style>
+        body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Kanit', sans-serif; margin: 0; }
+
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding-bottom: 80px; 
+            justify-content: space-between;
+            
+            /* LOCAL FILE USE KI HAI YAHAN */
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.6), rgba(2, 6, 23, 0.85)), 
+                              url('background-image.png'); /* Agar .png hai toh yaha badal lena */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .top-section { padding: 10px 20px; flex-shrink: 0; }
+        
+        .mini-ad {
+            width: 100%; height: 45px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px dashed #fbbf24; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.65rem; color: #94a3b8; margin-top: 5px;
+            backdrop-filter: blur(8px);
+        }
+
+        .middle-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+        }
+
+        .wallet-display { 
+            text-align: center;
+            background: rgba(15, 23, 42, 0.9);
+            padding: 12px 35px;
+            border-radius: 50px;
+            border: 1px solid rgba(251, 191, 36, 0.5);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+            margin-bottom: 20px;
+            backdrop-filter: blur(12px);
+        }
+
+        .wallet-text span { 
+            display: block;
+            font-size: 0.65rem; 
+            color: #fbbf24; 
+            font-weight: 900; 
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+        }
+        .wallet-text h1 { 
+            font-size: 2.6rem; 
+            margin: 0; 
+            font-weight: 900; 
+            line-height: 1.2;
+        }
+
+        .clicker-box {
+            position: relative;
+            width: 240px; height: 240px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        #mainCoinBtn {
+            font-size: 8rem; background: none; border: none; cursor: pointer;
+            /* POWERFUL GLOW */
+            filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.7)) 
+                    drop-shadow(0 0 45px rgba(251, 191, 36, 0.3));
+            transition: transform 0.05s ease-out;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        #mainCoinBtn:active { transform: scale(0.8); }
+
+        .bottom-section { 
+            padding: 0 20px 40px 20px; 
+            flex-shrink: 0; 
+        }
+
+        .jobs-card {
+            background: rgba(30, 41, 59, 0.95);
+            padding: 12px 20px;
+            border-radius: 100px; 
+            border: 1px solid rgba(251,191,36,0.6);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            transform: translateY(-25px);
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .jobs-info { display: flex; align-items: center; gap: 8px; }
+        .jobs-info h4 { margin: 0; font-size: 0.8rem; color: #fbbf24; }
+        .jobs-info p { margin: 0; font-size: 0.8rem; color: #fff; font-weight: 600; }
+
+        /* Particles - 1 COIN ONLY */
+        .tap-anim { position: absolute; color: #fbbf24; font-weight: 900; font-size: 1.8rem; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 1000; text-shadow: 0 0 12px rgba(0,0,0,0.8); }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-160px); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <div class="top-section">
+            <div class="mini-ad">SPONSOR BANNER</div>
+        </div>
+
+        <main class="middle-section">
+            <div class="wallet-display">
+                <div class="wallet-text">
+                    <span>NET WORTH</span>
+                    <h1 id="coinCountDisplay">0</h1>
+                </div>
+            </div>
+            
+            <div class="clicker-box">
+                <button id="mainCoinBtn">💎</button>
+            </div>
+        </main>
+
+        <div class="bottom-section">
+            <div class="jobs-card" onclick="window.location.href='jobs.html'">
+                <div class="jobs-info">
+                    <h4>🚀 SIDE HUSTLE:</h4>
+                    <p>Play minigames to get more coins!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+    <script>
+        function updateDisplay() {
+            let currentCoins = Number(localStorage.getItem('vv_coins')) || 0;
+            document.getElementById('coinCountDisplay').innerText = Math.floor(currentCoins).toLocaleString();
+        }
+
+        const btn = document.getElementById('mainCoinBtn');
+
+        function handleTap(e) {
+            let currentCoins = Number(localStorage.getItem('vv_coins')) || 0;
+            
+            // AB SIRF 1 COIN MILEGA
+            let tapPower = 1; 
+            
+            localStorage.setItem('vv_coins', currentCoins + tapPower);
+            updateDisplay();
+
+            const f = document.createElement('div');
+            f.className = 'tap-anim';
+            f.innerText = '+1'; // Visual update
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            f.style.left = clientX + 'px';
+            f.style.top = clientY + 'px';
+            document.body.appendChild(f);
+            setTimeout(() => f.remove(), 600);
+        }
+
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e); });
+        btn.addEventListener('mousedown', (e) => { if (e.button === 0) handleTap(e); });
+
+        setInterval(updateDisplay, 1000);
+        updateDisplay();
+    </script>
+</body>
+</html>

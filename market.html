@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Invest | Virtual Ventures</title>
+    <style>
+        body, html { height: 100%; overflow: hidden; margin: 0; background: #020617; font-family: 'Kanit', sans-serif; }
+        .invest-wrapper { display: flex; flex-direction: column; height: 100vh; padding-bottom: 90px; }
+
+        /* AD BANNER */
+        .ad-space { width: 92%; height: 50px; background: rgba(30, 41, 59, 0.4); margin: 10px auto; border-radius: 12px; border: 1px dashed #475569; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.7rem; flex-shrink: 0; }
+
+        /* TABS - TOP */
+        .invest-tabs { display: flex; background: #0f172a; padding: 5px; margin: 5px 15px; border-radius: 15px; border: 1px solid #1e293b; flex-shrink: 0; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; color: #64748b; font-weight: 900; font-size: 0.8rem; cursor: pointer; border-radius: 12px; text-transform: uppercase; }
+        .tab-btn.active { background: #fbbf24; color: #000; }
+
+        /* ECONOMY TICKER - NOW BELOW TABS */
+        .economy-ticker {
+            background: rgba(30, 41, 59, 0.3); margin: 5px 15px; padding: 10px;
+            border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-around; flex-shrink: 0;
+        }
+        .econ-item { font-size: 0.7rem; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
+        .val-red { color: #ef4444; }
+        .val-gold { color: #fbbf24; }
+
+        /* ASSET LIST */
+        .invest-content { flex: 1; overflow-y: auto; padding: 10px 15px; }
+        .asset-card { background: rgba(30, 41, 59, 0.5); border-radius: 22px; padding: 20px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05); }
+        .asset-main h3 { margin: 0; font-size: 1.2rem; color: #fff; font-weight: 900; }
+        .asset-main p { margin: 2px 0; font-size: 0.8rem; color: #94a3b8; font-weight: 700; }
+        .price-info { text-align: right; }
+        .price-val { font-size: 1.1rem; font-weight: 900; color: #fff; display: block; }
+        .change-val { font-size: 0.85rem; font-weight: 900; }
+        .up { color: #10b981; } .down { color: #ef4444; }
+
+        /* MODAL STYLES (Trading Popup) */
+        .trade-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(10px); }
+        .modal-box { width: 85%; background: #1e293b; border-radius: 30px; padding: 25px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .modal-box h2 { color: #fbbf24; margin-bottom: 5px; font-weight: 900; }
+        .qty-input { width: 100%; background: #0f172a; border: 1px solid #334155; padding: 15px; border-radius: 15px; color: #fff; font-size: 1.2rem; text-align: center; margin: 20px 0; font-family: 'Kanit'; }
+        .trade-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-action { padding: 15px; border-radius: 15px; border: none; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .buy-confirm { background: #fbbf24; color: #000; }
+        .sell-confirm { background: #ef4444; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="invest-wrapper">
+        <div class="ad-space">ADVERTISEMENT BANNER</div>
+
+        <div class="invest-tabs">
+            <button class="tab-btn active" onclick="switchTab('STOCKS')">STOCKS</button>
+            <button class="tab-btn" onclick="switchTab('CRYPTO')">CRYPTO</button>
+            <button class="tab-btn" onclick="switchTab('ESTATE')">ESTATE</button>
+        </div>
+
+        <div class="economy-ticker">
+            <div class="econ-item">TRADING FEE: <span class="val-red">2%</span></div>
+            <div class="econ-item">TAX: <span class="val-red">15%</span></div>
+            <div class="econ-item">BILLS: <span id="billRate" class="val-red">500/hr</span></div>
+        </div>
+
+        <main class="invest-content" id="investList"></main>
+    </div>
+
+    <div id="tradeModal" class="trade-modal">
+        <div class="modal-box">
+            <h2 id="modalTitle">ASSET NAME</h2>
+            <p id="modalPrice" style="color:#94a3b8; font-weight:700;">Price: 🟡 0</p>
+            <p id="modalOwned" style="color:#fbbf24; font-size:0.8rem;">Owned: 0</p>
+            <input type="number" id="tradeQty" class="qty-input" value="1">
+            <div class="trade-btns">
+                <button class="btn-action buy-confirm" onclick="executeTrade('BUY')">BUY</button>
+                <button class="btn-action sell-confirm" onclick="executeTrade('SELL')">SELL</button>
+            </div>
+            <button onclick="closeTrade()" style="margin-top:15px; background:none; border:none; color:#64748b; font-weight:700;">CANCEL</button>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+    <script>
+        // ... (Market Logic same as previous message)
+        let currentTab = 'STOCKS';
+        let selectedAsset = null;
+
+        const marketData = {
+            STOCKS: [
+                { id: 's1', name: 'G-NET', label: 'Tech', price: 450, volatility: 0.04 },
+                { id: 's2', name: 'Z-MOTORS', label: 'EVs', price: 1250, volatility: 0.06 },
+                { id: 's3', name: 'V-BANK', label: 'Finance', price: 890, volatility: 0.03 }
+            ],
+            CRYPTO: [
+                { id: 'c1', name: 'BITCOIN', label: 'BTC', price: 64000, volatility: 0.12 },
+                { id: 'c2', name: 'ETHER', label: 'ETH', price: 3200, volatility: 0.10 }
+            ],
+            ESTATE: [
+                { id: 'e1', name: 'PENTHOUSE', label: 'Luxury', price: 500000, volatility: 0, isFixed: true },
+                { id: 'e2', name: 'MALL SLOT', label: 'Retail', price: 1500000, volatility: 0, isFixed: true }
+            ]
+        };
+
+        function switchTab(t) {
+            currentTab = t;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.innerText.includes(t)));
+            render();
+        }
+
+        function render() {
+            const container = document.getElementById('investList');
+            let portfolio = JSON.parse(localStorage.getItem('vv_portfolio')) || {};
+            let html = '';
+
+            marketData[currentTab].forEach(item => {
+                let owned = portfolio[item.id] || 0;
+                let change = (Math.random() * 4 - 2).toFixed(2);
+                html += `
+                    <div class="asset-card" onclick="openTrade('${item.id}')">
+                        <div class="asset-main">
+                            <h3>${item.name}</h3>
+                            <p>${item.label} | Owned: ${owned}</p>
+                        </div>
+                        <div class="price-info">
+                            <span class="price-val">🟡 ${Math.floor(item.price).toLocaleString()}</span>
+                            <span class="change-val ${change >= 0 ? 'up' : 'down'}">${change >= 0 ? '▲' : '▼'} ${Math.abs(change)}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            // Dynamic Bills update in ticker
+            let bills = 500;
+            if (Object.keys(portfolio).length > 5) bills += 2000;
+            document.getElementById('billRate').innerText = bills + "/hr";
+        }
+
+        window.openTrade = (id) => {
+            selectedAsset = marketData[currentTab].find(i => i.id === id);
+            document.getElementById('modalTitle').innerText = selectedAsset.name;
+            document.getElementById('modalPrice').innerText = "Price: 🟡 " + Math.floor(selectedAsset.price).toLocaleString();
+            let portfolio = JSON.parse(localStorage.getItem('vv_portfolio')) || {};
+            document.getElementById('modalOwned').innerText = "Owned: " + (portfolio[id] || 0);
+            document.getElementById('tradeModal').style.display = 'flex';
+        };
+
+        window.closeTrade = () => { document.getElementById('tradeModal').style.display = 'none'; };
+
+        window.executeTrade = (type) => {
+            let qty = parseInt(document.getElementById('tradeQty').value);
+            if(qty <= 0 || isNaN(qty)) return;
+
+            let coins = Number(localStorage.getItem('vv_coins')) || 0;
+            let portfolio = JSON.parse(localStorage.getItem('vv_portfolio')) || {};
+            let totalCost = selectedAsset.price * qty;
+            let fee = totalCost * 0.02;
+
+            if(type === 'BUY') {
+                if(coins >= (totalCost + fee)) {
+                    localStorage.setItem('vv_coins', coins - (totalCost + fee));
+                    portfolio[selectedAsset.id] = (portfolio[selectedAsset.id] || 0) + qty;
+                } else alert("Insufficient Balance!");
+            } else {
+                if((portfolio[selectedAsset.id] || 0) >= qty) {
+                    localStorage.setItem('vv_coins', coins + (totalCost - fee));
+                    portfolio[selectedAsset.id] -= qty;
+                } else alert("Not enough assets!");
+            }
+
+            localStorage.setItem('vv_portfolio', JSON.stringify(portfolio));
+            closeTrade();
+            render();
+        };
+
+        setInterval(() => {
+            ['STOCKS', 'CRYPTO'].forEach(cat => {
+                marketData[cat].forEach(item => {
+                    item.price *= (1 + (Math.random() * 0.04 - 0.02));
+                });
+            });
+            render();
+        }, 5000);
+
+        render();
+    </script>
+</body>
+</html>

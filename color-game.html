@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Color Pro | Virtual Ventures</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: #020617; 
+            color: #f1f1f1; 
+            font-family: 'Kanit', sans-serif; 
+            height: 100dvh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            padding: 15px;
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.98)), url('background-image.png');
+            background-size: cover;
+        }
+        
+        .gold-text { color: #fbbf24; }
+        .royal-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(15px); border: 1px solid rgba(251, 191, 36, 0.2); }
+        
+        #gameArea { 
+            flex: 1; 
+            background: rgba(15, 23, 42, 0.5); 
+            border: 2px solid rgba(251, 191, 36, 0.1); 
+            border-radius: 24px; 
+            position: relative; 
+            overflow: hidden; 
+            margin-bottom: 15px; 
+        }
+        
+        .ball { 
+            width: 50px; height: 50px; 
+            border-radius: 50%; 
+            position: absolute; 
+            left: 50%; transform: translateX(-50%); 
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); 
+            z-index: 10; 
+            border: 3px solid rgba(255,255,255,0.4); 
+        }
+        
+        .btn-color { 
+            height: 65px; 
+            border-radius: 18px; 
+            border: 2px solid rgba(255,255,255,0.1); 
+            transition: transform 0.1s; 
+        }
+        .btn-color:active { transform: scale(0.9); }
+
+        #endPopup, #adOverlay { display: none; position: fixed; inset: 0; z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        #adOverlay { background: #020617; flex-direction: column; }
+        #endPopup { background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); }
+        
+        .v-progress { height: 100%; background: #fbbf24; width: 0%; transition: linear; }
+    </style>
+</head>
+<body>
+
+    <div id="adOverlay">
+        <div class="w-16 h-16 border-4 border-white/5 border-t-yellow-400 rounded-full animate-spin mb-6"></div>
+        <p class="gold-text font-black tracking-widest uppercase text-xs animate-pulse">Syncing Session...</p>
+        <div id="adTimerOverlay" class="mt-4 text-white font-black text-6xl">3</div>
+    </div>
+
+    <nav class="flex items-center justify-between mb-3">
+        <button onclick="window.location.href='jobs.html'" class="text-white text-xl"><i class="fas fa-chevron-left"></i></button>
+        <h1 class="text-lg font-black gold-text uppercase italic">Color Pro</h1>
+        <div class="w-8"></div>
+    </nav>
+
+    <div class="flex justify-between items-center px-4 py-3 mb-3 royal-card rounded-2xl">
+        <div class="flex flex-col">
+            <span class="text-[8px] text-gray-400 font-bold uppercase">Profit</span>
+            <div class="flex items-center gap-1.5 leading-none">
+                <i class="fas fa-coins gold-text text-sm"></i>
+                <span id="score" class="text-xl font-black text-white">0</span>
+            </div>
+        </div>
+        <div class="flex flex-col items-end">
+            <span class="text-[8px] text-gray-400 font-bold uppercase">Market Close In</span>
+            <div class="flex items-center gap-1.5 leading-none">
+                <i class="fas fa-clock text-blue-400 text-sm"></i>
+                <span id="timerText" class="text-xl font-black text-white">45s</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameArea">
+        <div id="fallingBall" class="ball" style="top: -60px;"></div>
+    </div>
+
+    <div class="pb-6 grid grid-cols-5 gap-2">
+        <button onclick="checkColor('red')" class="btn-color bg-red-500"></button>
+        <button onclick="checkColor('blue')" class="btn-color bg-blue-600"></button>
+        <button onclick="checkColor('green')" class="btn-color bg-green-500"></button>
+        <button onclick="checkColor('yellow')" class="btn-color bg-yellow-400"></button>
+        <button onclick="checkColor('purple')" class="btn-color bg-purple-600"></button>
+    </div>
+
+    <div id="endPopup">
+        <div class="w-full max-w-xs royal-card p-8 rounded-[2.5rem] text-center shadow-2xl">
+            <div id="syncSection">
+                <i class="fas fa-satellite-dish gold-text text-4xl mb-4"></i>
+                <h2 class="text-xl font-black uppercase text-white">Processing Coins</h2>
+                <div class="my-6 bg-black/20 py-4 rounded-2xl px-6">
+                    <div class="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div id="vProgress" class="v-progress"></div>
+                    </div>
+                    <p id="syncMsg" class="text-[8px] text-gray-400 uppercase mt-3 font-black tracking-widest">Uploading to Cloud...</p>
+                </div>
+            </div>
+
+            <div id="resultSection" class="hidden">
+                <i id="endIcon" class="fas fa-coins gold-text text-6xl mb-4"></i>
+                <h2 id="endStatus" class="text-2xl font-black uppercase text-white">Market Closed</h2>
+                <div class="my-5 bg-black/30 py-4 rounded-3xl border border-white/5">
+                    <p id="finalCoins" class="text-5xl font-black gold-text">0</p>
+                    <p class="text-[10px] font-bold text-gray-500 uppercase mt-1">Total Reward Added</p>
+                </div>
+                <div class="space-y-3">
+                    <button onclick="playAgainWithAd()" class="w-full py-4 rounded-xl font-black uppercase text-sm bg-yellow-400 text-black">Trade Again</button>
+                    <button onclick="window.location.href='jobs.html'" class="w-full bg-white/5 text-white py-3 rounded-xl font-black uppercase text-xs border border-white/10">More Jobs</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+    <script>
+        let score = 0, ballPos = -60, speed = 4.0, timeLeft = 45;
+        let gameActive = true, currentColor = '';
+        const colors = ['red', 'blue', 'green', 'yellow', 'purple'];
+        const ball = document.getElementById('fallingBall');
+        const gameArea = document.getElementById('gameArea');
+
+        function resetBall() {
+            ballPos = -60;
+            currentColor = colors[Math.floor(Math.random() * colors.length)];
+            const colorMap = { 'red': 'bg-red-500', 'blue': 'bg-blue-600', 'green': 'bg-green-500', 'yellow': 'bg-yellow-400', 'purple': 'bg-purple-600' };
+            ball.className = `ball ${colorMap[currentColor]}`;
+            speed += 0.15; 
+        }
+
+        function gameLoop() {
+            if(!gameActive) return;
+            ballPos += speed;
+            ball.style.top = ballPos + "px";
+            if (ballPos > gameArea.offsetHeight - 50) {
+                endGame("Out of Bounds", "fas fa-times-circle text-red-500");
+            } else {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function checkColor(clickedColor) {
+            if(!gameActive) return;
+            if (clickedColor === currentColor) {
+                score += 10; // Har sahi match par 10 coins
+                document.getElementById('score').innerText = score;
+                resetBall();
+            } else {
+                endGame("Wrong Signal!", "fas fa-bolt text-yellow-500");
+            }
+        }
+
+        function endGame(status, icon) {
+            gameActive = false;
+            document.getElementById('endStatus').innerText = status;
+            document.getElementById('endIcon').className = icon + " text-6xl mb-4";
+            document.getElementById('endPopup').style.display = "flex";
+            document.getElementById('finalCoins').innerText = score;
+
+            const progress = document.getElementById('vProgress');
+            const msgEl = document.getElementById('syncMsg');
+            const msgs = ["Securing Transaction...", "Verifying Profit...", "Updating Potli...", "Done!"];
+            
+            progress.style.transition = "3s linear";
+            setTimeout(() => progress.style.width = "100%", 50);
+            msgs.forEach((m, i) => setTimeout(() => { msgEl.innerText = m; }, i * 800));
+
+            setTimeout(() => {
+                let current = Number(localStorage.getItem('vv_coins')) || 0;
+                localStorage.setItem('vv_coins', current + score);
+                document.getElementById('syncSection').classList.add('hidden');
+                document.getElementById('resultSection').classList.remove('hidden');
+            }, 3200);
+        }
+
+        function playAgainWithAd() {
+            document.getElementById('endPopup').style.display = 'none';
+            document.getElementById('adOverlay').style.display = 'flex';
+            let left = 3;
+            let int = setInterval(() => {
+                left--; document.getElementById('adTimerOverlay').innerText = left;
+                if(left <= 0) { clearInterval(int); location.reload(); }
+            }, 1000);
+        }
+
+        // Timer Logic
+        let timerInterval = setInterval(() => {
+            if(!gameActive) return;
+            timeLeft--;
+            document.getElementById('timerText').innerText = timeLeft + "s";
+            if(timeLeft <= 0) endGame("Market Closed", "fas fa-clock text-blue-400");
+        }, 1000);
+
+        resetBall();
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>

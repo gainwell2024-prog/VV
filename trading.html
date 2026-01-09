@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Market | Virtual Ventures</title>
+    <style>
+        .market-card {
+            background: rgba(30, 41, 59, 0.4);
+            border-radius: 30px; padding: 30px;
+            text-align: center; border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 25px;
+        }
+
+        .price-tag { font-size: 3.5rem; font-weight: 900; margin: 10px 0; transition: 0.5s; }
+        .price-up { color: #4ade80; } /* Green */
+        .price-down { color: #ef4444; } /* Red */
+
+        .stats-row { 
+            display: flex; justify-content: space-around; 
+            background: rgba(15, 23, 42, 0.5); 
+            padding: 15px; border-radius: 20px; margin-bottom: 25px;
+        }
+        .stat-item h4 { font-size: 0.7rem; color: #94a3b8; letter-spacing: 1px; }
+        .stat-item p { font-size: 1.1rem; font-weight: 700; }
+
+        .trade-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .t-btn { 
+            padding: 18px; border-radius: 18px; border: none; 
+            font-family: 'Kanit'; font-weight: 900; font-size: 1rem; cursor: pointer; 
+        }
+        .buy-btn { background: #4ade80; color: #064e3b; }
+        .sell-btn { background: #ef4444; color: #fff; }
+        .t-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* Small Chart-like feel */
+        .trend { font-size: 0.8rem; font-weight: 700; padding: 4px 10px; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div style="display: flex; flex-direction: column; height: 100vh; width: 100%; max-width: 480px; margin: 0 auto;">
+        
+        <main class="content">
+            <h2 style="margin-bottom:20px; font-weight:900; letter-spacing:1px;">LIVE MARKET</h2>
+
+            <div class="market-card">
+                <span id="trendLabel" class="trend" style="background: rgba(74, 222, 128, 0.1); color: #4ade80;">▲ MARKET BULLISH</span>
+                <p style="color: #94a3b8; margin-top: 15px; font-size: 0.9rem;">GOLD PER UNIT</p>
+                <h1 id="priceDisplay" class="price-tag">🟡 1,000</h1>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-item">
+                    <h4>YOUR CASH</h4>
+                    <p id="userCash">🟡 0</p>
+                </div>
+                <div class="stat-item">
+                    <h4>OWNED GOLD</h4>
+                    <p id="userGold">0 Units</p>
+                </div>
+            </div>
+
+            <div class="trade-actions">
+                <button class="t-btn buy-btn" onclick="trade('buy')">BUY GOLD</button>
+                <button class="t-btn sell-btn" onclick="trade('sell')">SELL GOLD</button>
+            </div>
+
+            <p style="text-align: center; color: #64748b; font-size: 0.75rem; margin-top: 30px;">
+                Prices update every 3 seconds. Buy low, sell high!
+            </p>
+        </main>
+
+    </div>
+
+    <script src="settings.js"></script>
+
+    <script>
+        let goldPrice = Number(localStorage.getItem('vv_gold_price')) || 1000;
+        let lastPrice = goldPrice;
+
+        function updateUI() {
+            const coins = Number(localStorage.getItem('vv_coins')) || 0;
+            const ownedGold = Number(localStorage.getItem('vv_owned_gold')) || 0;
+
+            // UI Elements
+            const pDisplay = document.getElementById('priceDisplay');
+            const tLabel = document.getElementById('trendLabel');
+            
+            pDisplay.innerText = "🟡 " + goldPrice.toLocaleString();
+            document.getElementById('userCash').innerText = "🟡 " + Math.floor(coins).toLocaleString();
+            document.getElementById('userGold').innerText = ownedGold + " Units";
+
+            // Price Color Logic
+            if (goldPrice > lastPrice) {
+                pDisplay.className = "price-tag price-up";
+                tLabel.innerText = "▲ MARKET BULLISH";
+                tLabel.style.background = "rgba(74, 222, 128, 0.1)";
+                tLabel.style.color = "#4ade80";
+            } else if (goldPrice < lastPrice) {
+                pDisplay.className = "price-tag price-down";
+                tLabel.innerText = "▼ MARKET BEARISH";
+                tLabel.style.background = "rgba(239, 68, 68, 0.1)";
+                tLabel.style.color = "#ef4444";
+            }
+        }
+
+        function trade(type) {
+            let coins = Number(localStorage.getItem('vv_coins')) || 0;
+            let ownedGold = Number(localStorage.getItem('vv_owned_gold')) || 0;
+
+            if (type === 'buy' && coins >= goldPrice) {
+                coins -= goldPrice;
+                ownedGold++;
+            } else if (type === 'sell' && ownedGold > 0) {
+                coins += goldPrice;
+                ownedGold--;
+            } else {
+                return; // Not enough money/gold
+            }
+
+            localStorage.setItem('vv_coins', coins);
+            localStorage.setItem('vv_owned_gold', ownedGold);
+            updateUI();
+        }
+
+        // Price Fluctuation Logic
+        setInterval(() => {
+            lastPrice = goldPrice;
+            // Random change between -10% to +10%
+            const change = 1 + (Math.random() * 0.2 - 0.1); 
+            goldPrice = Math.floor(goldPrice * change);
+            
+            // Limit price so it doesn't become 0
+            if (goldPrice < 100) goldPrice = 100;
+            if (goldPrice > 10000) goldPrice = 10000;
+
+            localStorage.setItem('vv_gold_price', goldPrice);
+            updateUI();
+        }, 3000);
+
+        // Initial Load
+        updateUI();
+    </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Business Empire | Virtual Ventures</title>
+    <style>
+        /* Mobile Optimization */
+        body, html { height: 100%; overflow: hidden; margin: 0; background: #020617; }
+        
+        .biz-wrapper { display: flex; flex-direction: column; height: 100vh; padding-bottom: 90px; }
+
+        /* 1. TOP AD BANNER */
+        .ad-space {
+            width: 92%; height: 55px; background: rgba(30, 41, 59, 0.4);
+            margin: 10px auto; border-radius: 12px; border: 1px dashed #475569;
+            display: flex; align-items: center; justify-content: center;
+            color: #64748b; font-size: 0.75rem; flex-shrink: 0;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        
+        /* 2. STATS HEADER (Bigger Text) */
+        .biz-stats {
+            background: #0f172a; padding: 15px; text-align: center;
+            border-bottom: 1px solid #1e293b; flex-shrink: 0;
+        }
+        .income-tag { font-size: 0.8rem; color: #fbbf24; letter-spacing: 2px; font-weight: 900; }
+        .income-val { font-size: 2.2rem; font-weight: 900; color: #fff; margin-top: 2px; }
+
+        .biz-list { flex: 1; overflow-y: auto; padding: 15px; }
+
+        /* 3. BUSINESS CARDS (Safer for Thumb Tapping) */
+        .biz-card {
+            background: rgba(30, 41, 59, 0.5); border-radius: 22px;
+            padding: 18px; margin-bottom: 15px; display: flex; align-items: center;
+            border: 1px solid rgba(255,255,255,0.05); gap: 15px;
+        }
+        
+        .biz-icon { 
+            width: 70px; height: 70px; background: #1e293b; border-radius: 20px; 
+            display: flex; align-items: center; justify-content: center; font-size: 2.5rem;
+            flex-shrink: 0;
+        }
+
+        .biz-info { flex: 1; }
+        .biz-info h3 { margin: 0; font-size: 1.2rem; color: #fff; font-weight: 900; }
+        .biz-info p { margin: 3px 0; font-size: 0.85rem; color: #94a3b8; font-weight: 700; }
+        .owned-count { font-size: 0.9rem; color: #fbbf24; font-weight: 900; margin-top: 4px; }
+
+        .buy-action { text-align: right; min-width: 100px; }
+        .price-tag { display: block; font-size: 1rem; font-weight: 900; color: #fff; margin-bottom: 10px; }
+        
+        .btn-buy {
+            width: 100%; background: #fbbf24; color: #000; border: none; padding: 12px;
+            border-radius: 14px; font-weight: 900; font-size: 0.9rem; cursor: pointer;
+            box-shadow: 0 4px 0 #b45309; text-transform: uppercase;
+        }
+        .btn-buy:active { transform: translateY(2px); box-shadow: 0 2px 0 #b45309; }
+        .btn-buy:disabled { background: #334155; color: #64748b; box-shadow: none; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <div class="biz-wrapper">
+        <div class="ad-space">ADVERTISEMENT BANNER</div>
+
+        <div class="biz-stats">
+            <div class="income-tag">HOURLY INCOME</div>
+            <div id="totalIncome" class="income-val">🟡 0</div>
+        </div>
+
+        <main class="biz-list" id="bizContainer">
+            </main>
+    </div>
+
+    <script src="settings.js"></script>
+    <script>
+        const businesses = [
+            { id: 0, name: "Tea Stall", icon: "☕", cost: 500, income: 50 },
+            { id: 1, name: "Kirana Shop", icon: "🛒", cost: 3000, income: 280 },
+            { id: 2, name: "Gym Center", icon: "🏋️", cost: 15000, income: 1200 },
+            { id: 3, name: "Clothing Lab", icon: "👕", cost: 60000, income: 5500 },
+            { id: 4, name: "Tech Agency", icon: "💻", cost: 350000, income: 30000 },
+            { id: 5, name: "Cinema Hall", icon: "🎬", cost: 1200000, income: 110000 }
+        ];
+
+        function renderBiz() {
+            const container = document.getElementById('bizContainer');
+            const myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
+            const coins = Number(localStorage.getItem('vv_coins')) || 0;
+            let totalHrIncome = 0;
+
+            let html = '';
+            businesses.forEach(b => {
+                const owned = myBiz.find(item => item.id === b.id);
+                const count = owned ? owned.count : 0;
+                totalHrIncome += (count * b.income);
+
+                html += `
+                    <div class="biz-card">
+                        <div class="biz-icon">${b.icon}</div>
+                        <div class="biz-info">
+                            <h3>${b.name}</h3>
+                            <p>+${b.income.toLocaleString()}/hr</p>
+                            <div class="owned-count">QTY: ${count}</div>
+                        </div>
+                        <div class="buy-action">
+                            <span class="price-tag">🟡 ${b.cost.toLocaleString()}</span>
+                            <button class="btn-buy" onclick="buyBiz(${b.id})" ${coins < b.cost ? 'disabled' : ''}>BUY</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            document.getElementById('totalIncome').innerText = "🟡 " + totalHrIncome.toLocaleString();
+        }
+
+        window.buyBiz = function(id) {
+            let coins = Number(localStorage.getItem('vv_coins')) || 0;
+            const bData = businesses.find(b => b.id === id);
+            
+            if (coins >= bData.cost) {
+                localStorage.setItem('vv_coins', coins - bData.cost);
+                let myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
+                const idx = myBiz.findIndex(i => i.id === id);
+                
+                if (idx > -1) myBiz[idx].count++;
+                else myBiz.push({ id: id, count: 1, income: bData.income });
+                
+                localStorage.setItem('vv_biz', JSON.stringify(myBiz));
+                renderBiz();
+            }
+        };
+
+        setInterval(renderBiz, 1500); // Thoda slow refresh for performance
+        renderBiz();
+    </script>
+</body>
+</html>
