@@ -7,177 +7,169 @@
     <style>
         body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Kanit', sans-serif; margin: 0; }
 
+        /* Full screen container without scroll */
         .dashboard-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
-            padding-bottom: 80px; 
-            justify-content: space-between;
-            
-            /* LOCAL FILE USE KI HAI YAHAN */
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.6), rgba(2, 6, 23, 0.85)), 
-                              url('background-image.png'); /* Agar .png hai toh yaha badal lena */
+            width: 100%;
+            /* Footer ke liye space */
+            padding-bottom: 85px; 
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.95)), url('background-image.png');
             background-size: cover;
             background-position: center;
+            box-sizing: border-box;
         }
 
-        .top-section { padding: 10px 20px; flex-shrink: 0; }
-        
+        /* TOP SECTION: Ad & Networth */
+        .top-info { 
+            padding: 20px; 
+            text-align: center; 
+            flex-shrink: 0; 
+        }
         .mini-ad {
-            width: 100%; height: 45px;
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px dashed #fbbf24; border-radius: 12px;
+            width: 100%; height: 45px; background: rgba(30, 41, 59, 0.2);
+            border-radius: 12px; border: 1px dashed rgba(251, 191, 36, 0.2);
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.65rem; color: #94a3b8; margin-top: 5px;
-            backdrop-filter: blur(8px);
+            color: #475569; font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 15px;
         }
+        .nw-label { font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; }
+        .nw-value { font-size: 3rem; font-weight: 900; color: #fbbf24; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 
-        .middle-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 0;
+        /* MIDDLE SECTION: Clicker & Energy (Main Growth Area) */
+        .game-area { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
         }
-
-        .wallet-display { 
-            text-align: center;
-            background: rgba(15, 23, 42, 0.9);
-            padding: 12px 35px;
-            border-radius: 50px;
-            border: 1px solid rgba(251, 191, 36, 0.5);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
-            margin-bottom: 20px;
-            backdrop-filter: blur(12px);
-        }
-
-        .wallet-text span { 
-            display: block;
-            font-size: 0.65rem; 
-            color: #fbbf24; 
-            font-weight: 900; 
-            letter-spacing: 3px; 
-            text-transform: uppercase; 
-        }
-        .wallet-text h1 { 
-            font-size: 2.6rem; 
-            margin: 0; 
-            font-weight: 900; 
-            line-height: 1.2;
-        }
-
-        .clicker-box {
-            position: relative;
-            width: 240px; height: 240px;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        #mainCoinBtn {
-            font-size: 8rem; background: none; border: none; cursor: pointer;
-            /* POWERFUL GLOW */
-            filter: drop-shadow(0 0 25px rgba(251, 191, 36, 0.7)) 
-                    drop-shadow(0 0 45px rgba(251, 191, 36, 0.3));
-            transition: transform 0.05s ease-out;
-            user-select: none;
-            -webkit-user-select: none;
+        #mainCoinBtn { 
+            font-size: 7.5rem; cursor: pointer; transition: 0.1s; 
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
+            user-select: none; margin-bottom: 10px;
         }
         #mainCoinBtn:active { transform: scale(0.8); }
 
-        .bottom-section { 
-            padding: 0 20px 40px 20px; 
+        /* Energy Bar - Eye Friendly Slate Grey */
+        .energy-wrap { width: 60%; margin-top: 10px; }
+        .energy-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+        .energy-fill { height: 100%; background: #334155; width: 100%; transition: 0.4s ease; }
+        .energy-stats { display: flex; justify-content: space-between; margin-top: 8px; font-size: 8px; font-weight: 800; color: #475569; letter-spacing: 1px; }
+
+        /* BOTTOM SECTION: Side Hustle (Hamesha Footer ke upar) */
+        .hustle-section { 
+            padding: 15px 0; 
+            text-align: center; 
             flex-shrink: 0; 
+            background: transparent;
         }
-
-        .jobs-card {
-            background: rgba(30, 41, 59, 0.95);
-            padding: 12px 20px;
-            border-radius: 100px; 
-            border: 1px solid rgba(251,191,36,0.6);
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            transform: translateY(-25px);
+        .side-hustle-btn {
+            padding: 10px 30px; 
+            background: rgba(251, 191, 36, 0.05);
+            border: 1px solid rgba(251, 191, 36, 0.3); 
+            border-radius: 50px; color: #fbbf24;
+            font-size: 0.8rem; font-weight: 800; 
+            text-transform: uppercase; letter-spacing: 2px;
             cursor: pointer;
-            backdrop-filter: blur(10px);
         }
+        .hustle-msg { font-size: 9px; color: #475569; margin-top: 8px; font-weight: 600; }
 
-        .jobs-info { display: flex; align-items: center; gap: 8px; }
-        .jobs-info h4 { margin: 0; font-size: 0.8rem; color: #fbbf24; }
-        .jobs-info p { margin: 0; font-size: 0.8rem; color: #fff; font-weight: 600; }
-
-        /* Particles - 1 COIN ONLY */
-        .tap-anim { position: absolute; color: #fbbf24; font-weight: 900; font-size: 1.8rem; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 1000; text-shadow: 0 0 12px rgba(0,0,0,0.8); }
-        @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-160px); opacity: 0; } }
+        /* TAP ANIMATION */
+        .tap-anim { position: absolute; color: #fbbf24; font-weight: 900; font-size: 2rem; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 100; }
+        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-150px); } }
     </style>
 </head>
 <body>
 
     <div class="dashboard-container">
-        <div class="top-section">
-            <div class="mini-ad">SPONSOR BANNER</div>
+        <div class="top-info">
+            <div class="mini-ad">AD BANNER SPACE</div>
+            <p class="nw-label">NET WORTH</p>
+            <div id="coinCountDisplay" class="nw-value">--</div>
         </div>
 
-        <main class="middle-section">
-            <div class="wallet-display">
-                <div class="wallet-text">
-                    <span>NET WORTH</span>
-                    <h1 id="coinCountDisplay">0</h1>
-                </div>
-            </div>
+        <div class="game-area">
+            <div id="mainCoinBtn">🟡</div>
             
-            <div class="clicker-box">
-                <button id="mainCoinBtn">💎</button>
-            </div>
-        </main>
-
-        <div class="bottom-section">
-            <div class="jobs-card" onclick="window.location.href='jobs.html'">
-                <div class="jobs-info">
-                    <h4>🚀 SIDE HUSTLE:</h4>
-                    <p>Play minigames to get more coins!</p>
+            <div class="energy-wrap">
+                <div class="energy-bar-bg"><div id="energyFill" class="energy-fill"></div></div>
+                <div class="energy-stats">
+                    <span>VITALITY</span>
+                    <span id="energyText">-- / --</span>
                 </div>
             </div>
+        </div>
+
+        <div class="hustle-section">
+            <button onclick="window.location.href='hustle.html'" class="side-hustle-btn">SIDE HUSTLE</button>
+            <p class="hustle-msg">Play minigames to earn more coins</p>
         </div>
     </div>
 
     <script src="settings.js"></script>
     <script>
-        function updateDisplay() {
-            let currentCoins = Number(localStorage.getItem('vv_coins')) || 0;
-            document.getElementById('coinCountDisplay').innerText = Math.floor(currentCoins).toLocaleString();
+        function updateDashboard() {
+            let coins = Number(localStorage.getItem('vv_balance')) || 0;
+            const energy = Number(localStorage.getItem('vv_energy')) || 0;
+            const maxEnergy = Number(localStorage.getItem('vv_max_energy')) || 500;
+
+            document.getElementById('coinCountDisplay').innerText = Math.floor(coins).toLocaleString();
+            
+            const energyPercent = (energy / maxEnergy) * 100;
+            document.getElementById('energyFill').style.width = energyPercent + "%";
+            document.getElementById('energyText').innerText = `${Math.floor(energy)} / ${maxEnergy}`;
         }
 
-        const btn = document.getElementById('mainCoinBtn');
+        // Fix: Music on Interaction
+        function triggerAudio() {
+            if(window.audio && window.audio.bg.paused && localStorage.getItem('vv_music') !== 'off') {
+                window.audio.bg.play().catch(() => {});
+            }
+        }
 
         function handleTap(e) {
-            let currentCoins = Number(localStorage.getItem('vv_coins')) || 0;
+            triggerAudio();
+            let energy = Number(localStorage.getItem('vv_energy')) || 0;
+            if (energy < 1) return;
+
+            let coins = Number(localStorage.getItem('vv_balance')) || 0;
+            localStorage.setItem('vv_balance', coins + 1);
+            localStorage.setItem('vv_energy', energy - 1);
             
-            // AB SIRF 1 COIN MILEGA
-            let tapPower = 1; 
-            
-            localStorage.setItem('vv_coins', currentCoins + tapPower);
-            updateDisplay();
+            if(window.playSound) playSound('tap');
+            updateDashboard();
 
             const f = document.createElement('div');
             f.className = 'tap-anim';
-            f.innerText = '+1'; // Visual update
-            
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            
-            f.style.left = clientX + 'px';
-            f.style.top = clientY + 'px';
+            f.innerText = '+1';
+            const x = e.touches ? e.touches[0].clientX : e.clientX;
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            f.style.left = (x - 25) + 'px';
+            f.style.top = (y - 50) + 'px';
             document.body.appendChild(f);
             setTimeout(() => f.remove(), 600);
         }
 
+        const btn = document.getElementById('mainCoinBtn');
         btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e); });
-        btn.addEventListener('mousedown', (e) => { if (e.button === 0) handleTap(e); });
+        btn.addEventListener('mousedown', (e) => { handleTap(e); });
 
-        setInterval(updateDisplay, 1000);
-        updateDisplay();
+        // Logic Engine
+        setInterval(() => {
+            let coins = Number(localStorage.getItem('vv_balance')) || 0;
+            let exp = Number(localStorage.getItem('vv_hourly_exp')) || 0;
+            if(coins > 0) localStorage.setItem('vv_balance', coins - (exp / 3600));
+
+            let energy = Number(localStorage.getItem('vv_energy')) || 0;
+            let maxE = Number(localStorage.getItem('vv_max_energy')) || 500;
+            // Refill Ultra Slow (0.02)
+            if(energy < maxE) localStorage.setItem('vv_energy', Math.min(maxE, energy + 0.02));
+
+            updateDashboard();
+        }, 1000);
+
+        updateDashboard();
     </script>
 </body>
 </html>

@@ -3,26 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Login | Virtual Ventures</title>
+    <title>Virtual Ventures</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="login-style.css">
-    <style>
-        html, body { overflow: hidden !important; height: 100%; width: 100%; position: fixed; background: #020617; }
-        .main-tagline { color: #fbbf24 !important; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
-    </style>
+    <link rel="stylesheet" href="login-style.css"> 
 </head>
 <body>
-    <div class="screen login-bg">
+    <div class="screen login-bg"> 
         <div class="top-brand">
             <h1 class="main-title">VIRTUAL</h1>
             <h1 class="main-title">VENTURES</h1>
             <p class="main-tagline">VIRTUAL ECONOMY, REAL FUN</p>
         </div>
-        <div class="login-container">
+        <div class="login-container text-center">
             <button id="startBtn" class="google-style-btn">START JOURNEY</button>
-            <p class="dream-msg">"Every billionaire started with a single click."</p>
+            <p class="dream-msg" style="margin-top:20px; color:#94a3b8; font-size:12px;">"Every billionaire started with a single click."</p>
         </div>
     </div>
-    <script src="login-script.js"></script>
+
+    <script>
+        document.getElementById('startBtn').onclick = () => {
+            // Agar setup ho chuka hai toh seedha game mein, warna Tutorial dikhao
+            if (localStorage.getItem('vv_setup_done') === 'true') {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'tutorial.html';
+            }
+        };
+
+        // Auto-redirect for returning players
+        window.onload = () => {
+            if (localStorage.getItem('vv_setup_done') === 'true') {
+                window.location.href = 'dashboard.html';
+            }
+        };
+    </script>
 </body>
 </html>

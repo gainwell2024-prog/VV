@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Identity Setup | Virtual Ventures</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* SCROLLBAR REMOVAL */
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+        *::-webkit-scrollbar { display: none; }
+
+        body { 
+            background: linear-gradient(rgba(2,6,23,0.1), rgba(2,6,23,0.25)), url('setup-bg.jpg'); 
+            background-size: cover; background-position: center; background-attachment: fixed;
+            color: white; font-family: 'Inter', sans-serif; height: 100dvh; overflow: hidden; padding: 20px;
+        }
+        
+        .glass { 
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px); 
+            border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 30px; 
+            padding: 24px; height: 90vh; overflow-y: auto;
+        }
+        
+        .avatar-main {
+            width: 110px; height: 110px; background: rgba(251, 191, 36, 0.1);
+            border: 4px solid #fbbf24; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 4rem; cursor: pointer; margin: 0 auto 10px;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.2);
+            transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .section-header { 
+            background: rgba(255,255,255,0.08); padding: 16px; border-radius: 15px; 
+            margin-top: 12px; display: flex; justify-content: space-between; cursor: pointer;
+        }
+        .section-content { display: none; padding: 10px; background: rgba(0,0,0,0.4); border-radius: 0 0 15px 15px; }
+        .section-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+        .opt { 
+            display: flex; justify-content: space-between; padding: 14px; border-radius: 12px; 
+            margin-bottom: 8px; cursor: pointer; background: rgba(255,255,255,0.03); 
+            transition: 0.2s; border: 1px solid transparent;
+        }
+        .opt.selected { border-color: #fbbf24; background: rgba(251, 191, 36, 0.2); color: #fbbf24; font-weight: bold; }
+
+        /* CONFIRM MODAL */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px); display: none; 
+            align-items: center; justify-content: center; z-index: 100; padding: 20px;
+        }
+        .id-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            width: 100%; max-width: 350px; border-radius: 35px;
+            border: 2px solid #fbbf24; overflow: hidden;
+            box-shadow: 0 0 50px rgba(251, 191, 36, 0.2);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="glass max-w-md mx-auto">
+        <div class="text-center mb-6">
+            <div class="avatar-main" id="avBox" onclick="rotateAvatar()">👦</div>
+            <p class="text-[10px] text-yellow-500 font-bold uppercase tracking-[0.2em]">Touch to Switch Identity</p>
+        </div>
+
+        <div class="mb-8 px-2">
+            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block text-center mb-2">Reserve Your Legacy Name</label>
+            <input type="text" id="pName" class="w-full bg-black/50 border-b-2 border-yellow-500/50 rounded-xl p-4 outline-none focus:border-yellow-400 text-center font-black text-xl tracking-tighter" placeholder="YOUR NAME HERE">
+        </div>
+
+        <div class="section-header" onclick="toggleSec('dietSec')">
+            <span class="font-bold text-sm tracking-wide">🍱 DAILY DIET</span>
+            <i class="fas fa-chevron-down text-yellow-500"></i>
+        </div>
+        <div id="dietSec" class="section-content">
+            <div class="opt selected" onclick="pick(this, 'diet', 10)"><span>Vada Pav & Chai</span><span>10/hr</span></div>
+            <div class="opt" onclick="pick(this, 'diet', 40)"><span>Home Cooked Thali</span><span>40/hr</span></div>
+            <div class="opt" onclick="pick(this, 'diet', 150)"><span>Fast Food & Drinks</span><span>150/hr</span></div>
+            <div class="opt" onclick="pick(this, 'diet', 500)"><span>Gourmet Dining</span><span>500/hr</span></div>
+            <div class="opt" onclick="pick(this, 'diet', 2000)"><span>Private Chef Service</span><span>2k/hr</span></div>
+        </div>
+
+        <div class="section-header" onclick="toggleSec('liveSec')">
+            <span class="font-bold text-sm tracking-wide">🏠 LIVING STANDARD</span>
+            <i class="fas fa-chevron-down text-yellow-500"></i>
+        </div>
+        <div id="liveSec" class="section-content">
+            <div class="opt selected" onclick="pick(this, 'live', 20)"><span>Shared Dormitory</span><span>20/hr</span></div>
+            <div class="opt" onclick="pick(this, 'live', 150)"><span>Co-Living Studio</span><span>150/hr</span></div>
+            <div class="opt" onclick="pick(this, 'live', 800)"><span>City Center Flat</span><span>800/hr</span></div>
+            <div class="opt" onclick="pick(this, 'live', 3500)"><span>Luxury Penthouse</span><span>3.5k/hr</span></div>
+            <div class="opt" onclick="pick(this, 'live', 15000)"><span>Private Mega Mansion</span><span>15k/hr</span></div>
+        </div>
+
+        <div class="mt-8 grid grid-cols-2 gap-3">
+            <div class="p-4 bg-black/40 border border-white/10 rounded-2xl text-center">
+                <p class="text-[9px] text-gray-400 uppercase font-bold">Hourly Bill</p>
+                <p class="text-xl font-black text-yellow-500 italic" id="totalVal">30/hr</p>
+            </div>
+            <div class="p-4 bg-black/40 border border-white/10 rounded-2xl text-center">
+                <p class="text-[9px] text-gray-400 uppercase font-bold">Energy Cap</p>
+                <p class="text-xl font-black text-blue-400 italic" id="energyVal">500</p>
+            </div>
+        </div>
+
+        <button onclick="showConfirmModal()" class="w-full bg-yellow-500 text-black font-black py-5 rounded-2xl mt-6 mb-12 uppercase tracking-[3px] shadow-lg active:scale-95 transition-all">Claim Identity</button>
+    </div>
+
+    <div id="confirmModal" class="modal-overlay">
+        <div class="id-card">
+            <div class="bg-yellow-500 p-4 text-black text-center font-black tracking-tighter italic">CITIZENSHIP CARD</div>
+            <div class="p-8 text-center">
+                <div class="text-6xl mb-4" id="modalAv">👦</div>
+                <h2 id="modalName" class="text-2xl font-black text-white uppercase tracking-tighter">PLAYER NAME</h2>
+                <div class="space-y-3 text-left bg-black/30 p-4 rounded-2xl border border-white/5 my-6">
+                    <div class="flex justify-between text-xs"><span class="text-gray-400 uppercase">Energy Cap</span><span id="modalEnergy" class="text-white font-bold">500 Units</span></div>
+                    <div class="flex justify-between text-xs"><span class="text-gray-400 uppercase">Hourly Bill</span><span id="modalBill" class="text-yellow-500 font-bold">30/hr</span></div>
+                </div>
+                <button onclick="finalSave()" class="w-full bg-yellow-500 text-black font-black py-4 rounded-xl uppercase tracking-widest active:scale-95 transition">Start New Life</button>
+                <button onclick="closeModal()" class="mt-4 text-gray-500 text-[10px] uppercase font-bold tracking-widest">Back to Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const avs = ['👦','👧','🧔','👩','🤴','🥷','👨‍🚀','🧟','🧛','🐶','🦁','🤖'];
+        let avIdx = 0;
+        let stats = { diet: 10, live: 20, avatar: '👦' };
+
+        // Energy Table Logic
+        const dietMap = { 10: 0, 40: 1, 150: 2, 500: 3, 2000: 4 };
+        const liveMap = { 20: 0, 150: 1, 800: 2, 3500: 3, 15000: 4 };
+        const energyMatrix = [
+            [500, 550, 600, 650, 700],
+            [600, 750, 800, 850, 900],
+            [700, 850, 1000, 1100, 1150],
+            [800, 950, 1150, 1300, 1400],
+            [900, 1050, 1250, 1400, 1500]
+        ];
+
+        function rotateAvatar() {
+            avIdx = (avIdx + 1) % avs.length;
+            stats.avatar = avs[avIdx];
+            document.getElementById('avBox').innerText = stats.avatar;
+        }
+
+        function toggleSec(id) {
+            document.getElementById(id).classList.toggle('active');
+        }
+
+        function updateLiveStats() {
+            const bill = stats.diet + stats.live;
+            const energy = energyMatrix[dietMap[stats.diet]][liveMap[stats.live]];
+            document.getElementById('totalVal').innerText = bill + "/hr";
+            document.getElementById('energyVal').innerText = energy;
+        }
+
+        function pick(el, type, cost) {
+            Array.from(el.parentElement.children).forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            stats[type] = cost;
+            updateLiveStats();
+        }
+
+        function showConfirmModal() {
+            let name = document.getElementById('pName').value.trim();
+            if(!name) return alert("Pehle naam toh likho bhai!");
+            
+            document.getElementById('modalName').innerText = name;
+            document.getElementById('modalAv').innerText = stats.avatar;
+            document.getElementById('modalBill').innerText = (stats.diet + stats.live) + "/hr";
+            document.getElementById('modalEnergy').innerText = energyMatrix[dietMap[stats.diet]][liveMap[stats.live]] + " Units";
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('confirmModal').style.display = 'none'; }
+
+        function finalSave() {
+            let name = document.getElementById('pName').value.trim();
+            const energy = energyMatrix[dietMap[stats.diet]][liveMap[stats.live]];
+            const checksum = btoa(500 + "VV_BOSS_786" + name); //
+
+            localStorage.setItem('vv_name', name);
+            localStorage.setItem('vv_avatar', stats.avatar);
+            localStorage.setItem('vv_hourly_exp', (stats.diet + stats.live));
+            localStorage.setItem('vv_balance', 500);
+            localStorage.setItem('vv_max_energy', energy);
+            localStorage.setItem('vv_energy', energy);
+            localStorage.setItem('vv_last_check', Date.now());
+            localStorage.setItem('vv_checksum', checksum);
+            localStorage.setItem('vv_setup_done', 'true');
+
+            window.location.href = 'dashboard.html';
+function finalSave() {
+    // ... tera purana saving logic ...
+
+    // Add these for Settings & Sound
+    localStorage.setItem('vv_music', 'on');
+    localStorage.setItem('vv_sound', 'on');
+    localStorage.setItem('vv_setup_done', 'true');
+
+    window.location.href = 'dashboard.html';
+}
+        }
+    </script>
+</body>
+</html>
