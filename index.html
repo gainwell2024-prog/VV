@@ -16,22 +16,42 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; width: 100%; overflow: hidden; background: #020617; font-family: 'Inter', sans-serif; color: white; }
+        
+        /* Custom Install Banner Style */
+        #installPrompt {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; 
+            background: #fbbf24; color: #000; padding: 15px; text-align: center; 
+            font-weight: 800; font-size: 0.8rem; z-index: 10000; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        #installPrompt button {
+            background: #000; color: #fff; border: none; padding: 6px 12px; 
+            border-radius: 5px; margin-left: 10px; font-weight: 900; font-size: 0.7rem;
+        }
+
         .screen {
             width: 100%; height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            padding: 60px 20px 110px 20px; /* Extra padding for navigation bars */
+            /* Bottom padding badha di hai taaki msg niche na chhup jaye */
+            padding: 60px 20px 110px 20px; 
             background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('bg.png');
             background-repeat: no-repeat; background-size: cover; background-position: center;
         }
         .top-brand { text-align: center; width: 100%; }
         .main-title { font-size: 2.8rem; color: #fbbf24; letter-spacing: 5px; text-shadow: 3px 3px 15px rgba(0,0,0,0.8); font-weight: 900; line-height: 1.1; }
         .main-tagline { font-size: 0.85rem; color: #fff; letter-spacing: 3px; margin-top: 10px; font-weight: bold; text-transform: uppercase; }
+        
         .login-container { width: 100%; max-width: 340px; text-align: center; margin-bottom: env(safe-area-inset-bottom, 30px); }
         .google-style-btn { width: 100%; padding: 18px; background: #ffffff; color: #000; border: none; border-radius: 50px; font-weight: 800; font-size: 1.1rem; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
         .dream-msg { margin-top: 25px; font-style: italic; font-size: 0.8rem; color: rgba(255,255,255,0.9); text-shadow: 1px 1px 5px #000; display: block; }
     </style>
 </head>
 <body>
+
+    <div id="installPrompt">
+        FOR BETTER EXPERIENCE: INSTALL APP 
+        <button onclick="triggerInstall()">INSTALL</button>
+    </div>
+
     <div class="screen"> 
         <div class="top-brand">
             <h1 class="main-title">VIRTUAL</h1>
@@ -45,15 +65,37 @@
     </div>
 
     <script>
-        // SERVICE WORKER REGISTRATION (Most Important for "Install" button)
+        // --- PWA & INSTALL LOGIC ---
+        let deferredPrompt;
+        const installDiv = document.getElementById('installPrompt');
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('Service Worker Registered!'))
-                .catch(err => console.log('SW Registration Failed:', err));
+                navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
             });
         }
 
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installDiv.style.display = 'block';
+        });
+
+        function triggerInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') installDiv.style.display = 'none';
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            installDiv.style.display = 'none';
+        }
+
+        // --- BUTTON LOGIC ---
         document.getElementById('startBtn').onclick = () => {
             window.location.href = localStorage.getItem('vv_setup_done') === 'true' ? 'dashboard.html' : 'tutorial.html';
         };
