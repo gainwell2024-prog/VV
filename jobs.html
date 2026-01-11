@@ -2,179 +2,182 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Earn More | Virtual Ventures</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Side Hustle | Virtual Ventures</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body, html { height: 100%; margin: 0; background: #020617; color: #fff; font-family: 'Kanit', sans-serif; overflow: hidden; }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { 
+            height: 100%; overflow: hidden; background: #020617; 
+            color: white; font-family: 'Kanit', sans-serif; 
+        }
+
         .jobs-wrapper { 
             display: flex; flex-direction: column; height: 100vh; width: 100%; 
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.85), rgba(2, 6, 23, 0.98)), 
-                              url('background-image.png'); 
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.6), rgba(2, 6, 23, 0.9)), 
+                              url('jobs-bg.webp'); 
             background-size: cover; background-position: center;
+            padding-top: 70px; padding-bottom: 90px;
         }
 
-        /* EXTRA SCROLL SPACE: padding-bottom increased to 250px */
-        .content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 250px; scroll-behavior: smooth; }
-
-        .ad-banner {
-            width: 100%; height: 65px;
-            background: rgba(30, 41, 59, 0.6);
-            margin-bottom: 25px; border-radius: 18px;
-            border: 1px dashed #fbbf24;
+        /* 1. AD BANNER (Wapas le aaya revenue ke liye) */
+        .global-ad-banner {
+            width: 92%; height: 45px; background: rgba(15, 23, 42, 0.9); 
+            border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            color: #94a3b8; font-size: 0.75rem; backdrop-filter: blur(10px);
-            font-weight: 700; letter-spacing: 1px;
+            color: #fbbf24; font-size: 0.65rem; font-weight: 800; 
+            letter-spacing: 2px; margin: 0 auto 15px auto; backdrop-filter: blur(10px);
         }
 
-        .section-title { font-size: 1.5rem; font-weight: 900; letter-spacing: 1.5px; color: #fbbf24; margin: 10px 0 20px 5px; text-transform: uppercase; font-style: italic; }
+        .content { flex: 1; overflow-y: auto; padding: 15px; scrollbar-width: none; }
+        .content::-webkit-scrollbar { display: none; }
 
-        .job-item {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(251, 191, 36, 0.1);
-            border-radius: 24px; padding: 20px;
-            display: flex; align-items: center;
-            margin-bottom: 15px; gap: 15px;
-            backdrop-filter: blur(15px);
+        .glass-box { 
+            background: rgba(15, 23, 42, 0.8); border-radius: 20px; 
+            border: 1px solid rgba(251, 191, 36, 0.2); backdrop-filter: blur(15px);
+            margin-bottom: 15px; padding: 15px; display: flex; align-items: center; gap: 15px;
         }
 
-        .job-icon { font-size: 2.5rem; width: 60px; text-align: center; }
-        .job-details { flex: 1; }
-        .job-details h3 { font-size: 1.1rem; color: #fff; margin: 0; font-weight: 700; }
-        .reward-info { color: #fbbf24; font-size: 0.85rem; font-weight: 900; margin-top: 4px; display: block; }
+        .game-icon { width: 55px; height: 55px; background: rgba(251, 191, 36, 0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .game-info { flex: 1; }
+        .game-info h3 { font-size: 1.1rem; font-weight: 800; color: #fff; }
+        .game-info p { font-size: 0.65rem; color: #94a3b8; font-weight: 600; }
+
+        .energy-cost { font-size: 0.65rem; color: #fbbf24; font-weight: 900; margin-top: 4px; }
 
         .play-btn {
-            background: #fbbf24; color: #000; border: none;
-            padding: 12px 22px; border-radius: 14px;
-            font-weight: 900; font-size: 0.85rem; cursor: pointer;
-            box-shadow: 0 4px 0 #b48a1d;
+            border: none; padding: 10px 15px; border-radius: 12px; font-weight: 900;
+            font-size: 0.7rem; letter-spacing: 0.5px; cursor: pointer; min-width: 100px;
             font-family: 'Kanit';
-            text-transform: uppercase;
         }
-        .play-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #b48a1d; }
+        .btn-play { background: #fbbf24; color: #020617; }
+        .btn-ad { background: #4ade80; color: #020617; }
 
-        /* AD OVERLAY SYSTEM */
-        #videoOverlay {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: radial-gradient(circle, #1e293b, #020617);
-            z-index: 10000; display: none;
-            flex-direction: column; align-items: center; justify-content: center;
-            text-align: center;
-        }
-        .loader-ring { width: 80px; height: 80px; border: 5px solid rgba(251, 191, 36, 0.1); border-top: 5px solid #fbbf24; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .page-head { margin-bottom: 10px; padding-left: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .page-head h1 { font-size: 1.5rem; font-weight: 900; }
+        .energy-badge { background: rgba(251, 191, 36, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid #fbbf24; color: #fbbf24; font-size: 0.8rem; font-weight: 900; }
+
+        #videoOverlay { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <div class="jobs-wrapper">
-        <main class="content">
-            <div class="ad-banner">PREMIUM AD PLACEMENT</div>
+        <div class="global-ad-banner">PREMIUM SPONSOR AD</div>
 
-            <h2 class="section-title">🚀 Side Hustles</h2>
-
-            <div id="jobsList">
-                <div class="job-item">
-                    <div class="job-icon">📺</div>
-                    <div class="job-details">
-                        <h3>Instant Bonus</h3>
-                        <span class="reward-info">REWARD: 🟡 500</span>
-                    </div>
-                    <button class="play-btn" onclick="playWithAd(null, 500)">WATCH</button>
-                </div>
-
-                <div class="job-item">
-                    <div class="job-icon">🎲</div>
-                    <div class="job-details">
-                        <h3>Lucky Dice</h3>
-                        <span class="reward-info">MAX REWARD: 🟡 500</span>
-                    </div>
-                    <button class="play-btn" onclick="playWithAd('dice-game.html')">PLAY</button>
-                </div>
-
-                <div class="job-item">
-                    <div class="job-icon">🧠</div>
-                    <div class="job-details">
-                        <h3>Math Master</h3>
-                        <span class="reward-info">REWARD: 🟡 250 / WIN</span>
-                    </div>
-                    <button class="play-btn" onclick="playWithAd('math-game.html')">PLAY</button>
-                </div>
-
-                <div class="job-item">
-                    <div class="job-icon">🃏</div>
-                    <div class="job-details">
-                        <h3>Memory Match</h3>
-                        <span class="reward-info">REWARD: 🟡 400 / WIN</span>
-                    </div>
-                    <button class="play-btn" onclick="playWithAd('memory-game.html')">PLAY</button>
-                </div>
-
-                <div class="job-item">
-                    <div class="job-icon">🎨</div>
-                    <div class="job-details">
-                        <h3>Color Match</h3>
-                        <span class="reward-info">REWARD: 🟡 SCORE x 1</span>
-                    </div>
-                    <button class="play-btn" onclick="playWithAd('color-game.html')">PLAY</button>
-                </div>
-
-                <div class="job-item">
-                    <div class="job-icon">🔢</div>
-                    <div class="job-details">
-                        <h3>2048 Wealth</h3>
-                        <span class="reward-info">REWARD: 🟡 1000 / WIN</span>
-                    </div>
-                    <button class="play-btn" onclick="playWithAd('game-2048.html')">PLAY</button>
-                </div>
+        <div class="content">
+            <div class="page-head">
+                <h1>SIDE HUSTLE</h1>
+                <div class="energy-badge" id="userEnergyDisplay">⚡ 0</div>
             </div>
-        </main>
+
+            <div id="gamesContainer"></div>
+        </div>
     </div>
 
     <div id="videoOverlay">
-        <div class="loader-ring"></div>
-        <h2 id="adStatus" style="color:#fbbf24; font-weight: 900; letter-spacing: 2px;">LOADING AD</h2>
-        <div id="adTimer" style="font-size: 5rem; font-weight: 900; margin: 10px;">5</div>
-        <p style="color:#94a3b8; font-weight: 700; text-transform: uppercase; font-size: 0.7rem;">Connecting to Secure Ad Server...</p>
+        <div style="text-align: center;">
+            <p style="color: #fbbf24; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px;">LOADING REWARD AD</p>
+            <h1 id="adTimer" style="font-size: 4rem; font-weight: 900;">5</h1>
+        </div>
     </div>
 
     <script src="settings.js"></script>
     <script>
-        function playWithAd(targetUrl, directReward = null) {
-            const overlay = document.getElementById('videoOverlay');
-            const timerText = document.getElementById('adTimer');
-            const statusText = document.getElementById('adStatus');
-            
-            overlay.style.display = 'flex';
-            statusText.innerText = directReward ? "REWARD AD" : "LOADING GAME AD";
-            
-            let timeLeft = 5; // 5 Second Ad
+    // Games Configuration with updated filenames
+    const games = [
+        { id: 'dice', name: 'Lucky Dice', icon: '🎲', desc: 'High risk, higher rewards', url: 'dice-game.html' },
+        { id: 'math', name: 'Math Master', icon: '🧮', desc: 'Solve & Earn capital', url: 'math-game.html' },
+        { id: 'memory', name: 'Memory Match', icon: '🧠', desc: 'Find pairs, gain focus', url: 'memory-game.html' },
+        { id: 'color', name: 'Color Match', icon: '🎨', desc: 'Reflex test for money', url: 'color-game.html' },
+        { id: '2048', name: '2048 Wealth', icon: '🏆', desc: 'Merge tiles to grow', url: '2048-game.html' }
+    ];
+
+    function getEnergyCost() {
+        const dietCost = Number(localStorage.getItem('vv_diet_cost')) || 10;
+        const liveCost = Number(localStorage.getItem('vv_live_cost')) || 20;
+        const dietLevels = { 10:1, 40:2, 150:3, 500:4, 2000:5 };
+        const liveLevels = { 20:1, 150:2, 800:3, 3500:4, 15000:5 };
+        let level = (dietLevels[dietCost] || 1) + (liveLevels[liveCost] || 1); 
+        return (level * 50); 
+    }
+
+    function updateLiveUI() {
+        const currentEnergy = Number(localStorage.getItem('vv_energy')) || 0;
+        const cost = getEnergyCost();
+        const display = document.getElementById('userEnergyDisplay');
+        if(display) display.innerText = `⚡ ${Math.floor(currentEnergy)}`;
+        
+        const btns = document.querySelectorAll('.play-btn');
+        btns.forEach((btn, index) => {
+            const canPlay = currentEnergy >= cost;
+            if(canPlay) {
+                btn.innerText = 'PLAY';
+                btn.className = 'play-btn btn-play';
+            } else {
+                btn.innerText = 'WATCH AD';
+                btn.className = 'play-btn btn-ad';
+            }
+        });
+    }
+
+    function renderGames() {
+        const container = document.getElementById('gamesContainer');
+        const cost = getEnergyCost();
+        container.innerHTML = '';
+
+        games.forEach(g => {
+            container.innerHTML += `
+                <div class="glass-box">
+                    <div class="game-icon">${g.icon}</div>
+                    <div class="game-info">
+                        <h3>${g.name}</h3>
+                        <p>${g.desc}</p>
+                        <div class="energy-cost">⚡ COST: ${cost}</div>
+                    </div>
+                    <button class="play-btn" onclick="handleAction('${g.url}')">CHECKING...</button>
+                </div>
+            `;
+        });
+        updateLiveUI();
+    }
+
+    function handleAction(url) {
+        const currentEnergy = Number(localStorage.getItem('vv_energy')) || 0;
+        const cost = getEnergyCost();
+
+        if (currentEnergy >= cost) {
+            // Deduct Energy and go to game
+            localStorage.setItem('vv_energy', currentEnergy - cost);
+            window.location.href = url;
+        } else {
+            // Show Ad and refill for 1 game
+            showAd(() => {
+                localStorage.setItem('vv_energy', cost);
+                updateLiveUI();
+            });
+        }
+    }
+
+    function showAd(callback) {
+        const overlay = document.getElementById('videoOverlay');
+        const timerText = document.getElementById('adTimer');
+        overlay.style.display = 'flex';
+        let timeLeft = 5;
+        timerText.innerText = timeLeft;
+        const interval = setInterval(() => {
+            timeLeft--;
             timerText.innerText = timeLeft;
+            if(timeLeft <= 0) {
+                clearInterval(interval);
+                overlay.style.display = 'none';
+                callback();
+            }
+        }, 1000);
+    }
 
-            const interval = setInterval(() => {
-                timeLeft--;
-                timerText.innerText = timeLeft;
-                
-                if(timeLeft <= 0) {
-                    clearInterval(interval);
-                    overlay.style.display = 'none';
-                    
-                    if(directReward) {
-                        rewardUser(directReward);
-                    } else if(targetUrl) {
-                        window.location.href = targetUrl;
-                    }
-                }
-            }, 1000);
-        }
-
-        function rewardUser(amount) {
-            let coins = Number(localStorage.getItem('vv_coins')) || 0;
-            localStorage.setItem('vv_coins', coins + amount);
-            alert("Reward Claimed: 🟡 " + amount);
-            location.reload(); 
-        }
-    </script>
+    setInterval(updateLiveUI, 500);
+    window.onload = renderGames;
+</script>
 </body>
 </html>

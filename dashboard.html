@@ -86,70 +86,64 @@
 
     <script src="settings.js"></script>
     <script>
-        // --- 5x5 ENERGY REFILL LOGIC ---
-        // Kam energy wala (Vada Pav) slow refill hoga, Mehenga wala (Private Chef) fast!
-        function getRefillRate() {
-            const diet = localStorage.getItem('vv_diet_name') || "Vada Pav & Chai";
-            const rates = {
-                "Vada Pav & Chai": 0.3,       // Slowest
-                "Home Cooked Thali": 0.6,
-                "Fast Food & Drinks": 1.0, 
-                "Gourmet Dining": 1.5,
-                "Private Chef Service": 2.2    // Fastest
-            };
-            return rates[diet] || 0.5;
-        }
+    function getMaxEnergy() {
+        return Number(localStorage.getItem('vv_max_energy')) || 500;
+    }
 
-        function getMaxEnergy() {
-            const maxE = localStorage.getItem('vv_max_energy');
-            return maxE ? Number(maxE) : 500;
-        }
+    // Refill Rate half values for dashboard display
+    function getRefillRate() {
+        const dietCost = Number(localStorage.getItem('vv_diet_cost')) || 10;
+        const rates = { 10: 0.15, 40: 0.3, 150: 0.5, 500: 0.75, 2000: 1.25 };
+        return rates[dietCost] || 0.15;
+    }
 
-        function formatBalance(num) {
-            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
-            return Math.floor(num).toLocaleString();
-        }
+    function formatBalance(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+        return Math.floor(num).toLocaleString();
+    }
 
-        function updateUI() {
-            let coins = Number(localStorage.getItem('vv_balance')) || 0;
-            const energy = Number(localStorage.getItem('vv_energy')) || 0;
-            const maxE = getMaxEnergy();
-            document.getElementById('coinCountDisplay').innerText = formatBalance(coins);
-            document.getElementById('energyFill').style.width = (energy / maxE) * 100 + "%";
-            document.getElementById('energyText').innerText = `${Math.floor(energy)} / ${maxE}`;
-        }
+    function updateUI() {
+    let coins = Number(localStorage.getItem('vv_balance')) || 0;
+    let currentEnergy = Number(localStorage.getItem('vv_energy')) || 0;
+    const maxE = getMaxEnergy();
 
-        function handleTap(e) {
-            let energy = Number(localStorage.getItem('vv_energy')) || 0;
-            if (energy < 1) return;
-            localStorage.setItem('vv_balance', (Number(localStorage.getItem('vv_balance')) || 0) + 1);
-            localStorage.setItem('vv_energy', energy - 1);
-            updateUI();
-            const f = document.createElement('div'); f.className = 'tap-anim'; f.innerText = '+1';
-            const x = e.touches ? e.touches[0].clientX : e.clientX;
-            const y = e.touches ? e.touches[0].clientY : e.clientY;
-            f.style.left = (x - 20) + 'px'; f.style.top = (y - 40) + 'px';
-            document.body.appendChild(f); setTimeout(() => f.remove(), 600);
-        }
+    if (currentEnergy < maxE) {
+        currentEnergy = Math.min(maxE, currentEnergy + (getRefillRate() * 0.5));
+        localStorage.setItem('vv_energy', currentEnergy);
+    }
 
-        const btn = document.getElementById('mainCoinBtn');
-        btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e); });
-        btn.addEventListener('mousedown', (e) => { handleTap(e); });
+    // Naya global formatter use ho raha hai
+    document.getElementById('coinCountDisplay').innerText = window.formatBalance(coins);
+    document.getElementById('energyFill').style.width = (currentEnergy / maxE) * 100 + "%";
+    document.getElementById('energyText').innerText = `${Math.floor(currentEnergy)} / ${maxE}`;
+}
 
-        // REFILL ENGINE based on Diet Selection
-        setInterval(() => {
-            let energy = Number(localStorage.getItem('vv_energy')) || 0;
-            let maxE = getMaxEnergy();
-            let rate = getRefillRate(); // Diet ke base par speed change hogi
-            if(energy < maxE) {
-                localStorage.setItem('vv_energy', Math.min(maxE, energy + rate));
-            }
-            updateUI();
-        }, 1000);
-
+    function handleTap(e) {
+        let energy = Number(localStorage.getItem('vv_energy')) || 0;
+        if (energy < 1) return;
+        
+        if(window.navigator.vibrate) window.navigator.vibrate(10);
+        
+        localStorage.setItem('vv_balance', (Number(localStorage.getItem('vv_balance')) || 0) + 1);
+        localStorage.setItem('vv_energy', energy - 1);
+        
+        // Instant update on tap
         updateUI();
-    </script>
-</body>
 
+        const f = document.createElement('div'); f.className = 'tap-anim'; f.innerText = '+1';
+        const x = e.touches ? e.touches[0].clientX : e.clientX;
+        const y = e.touches ? e.touches[0].clientY : e.clientY;
+        f.style.left = (x - 20) + 'px'; f.style.top = (y - 40) + 'px';
+        document.body.appendChild(f); setTimeout(() => f.remove(), 600);
+    }
+
+    const btn = document.getElementById('mainCoinBtn');
+    btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e); });
+    btn.addEventListener('mousedown', (e) => { handleTap(e); });
+
+    setInterval(updateUI, 1000); 
+    updateUI();
+</script>
+</body>
 </html>
