@@ -2,91 +2,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Dashboard | Virtual Ventures</title>
     <style>
-        body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Kanit', sans-serif; margin: 0; }
+        /* CSS RESET */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Inter', sans-serif; }
 
-        /* Full screen container without scroll */
-        .dashboard-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: 100%;
-            /* Footer ke liye space */
-            padding-bottom: 85px; 
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.95)), url('background-image.png');
-            background-size: cover;
-            background-position: center;
-            box-sizing: border-box;
-        }
-
-        /* TOP SECTION: Ad & Networth */
-        .top-info { 
-            padding: 20px; 
-            text-align: center; 
-            flex-shrink: 0; 
-        }
-        .mini-ad {
-            width: 100%; height: 45px; background: rgba(30, 41, 59, 0.2);
-            border-radius: 12px; border: 1px dashed rgba(251, 191, 36, 0.2);
+        /* 1. AD BANNER (Top branding ke theek niche) */
+        .global-ad-banner {
+            width: 100%; height: 45px; background: rgba(15, 23, 42, 0.8); 
+            border-bottom: 1px solid rgba(251, 191, 36, 0.3);
             display: flex; align-items: center; justify-content: center;
-            color: #475569; font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 15px;
+            color: #fbbf24; font-size: 0.65rem; font-weight: 800; 
+            letter-spacing: 2px; margin-top: 55px; /* Branding ke liye gap */
+            backdrop-filter: blur(10px);
         }
-        .nw-label { font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; }
-        .nw-value { font-size: 3rem; font-weight: 900; color: #fbbf24; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 
-        /* MIDDLE SECTION: Clicker & Energy (Main Growth Area) */
-        .game-area { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
+        /* 2. MAIN CONTAINER */
+        .dashboard-container {
+            display: flex; flex-direction: column; height: 100vh; width: 100%;
+            padding-bottom: 100px; /* Footer navigation ke liye space */
+            /* Background Opacity 0.4 taaki image dikhe */
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4), rgba(2, 6, 23, 0.8)), url('dashboard-bg.png');
+            background-size: cover; background-position: center;
         }
-        #mainCoinBtn { 
-            font-size: 7.5rem; cursor: pointer; transition: 0.1s; 
-            filter: drop-shadow(0 0 15px rgba(0,0,0,0.5));
-            user-select: none; margin-bottom: 10px;
-        }
-        #mainCoinBtn:active { transform: scale(0.8); }
 
-        /* Energy Bar - Eye Friendly Slate Grey */
-        .energy-wrap { width: 60%; margin-top: 10px; }
-        .energy-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
-        .energy-fill { height: 100%; background: #334155; width: 100%; transition: 0.4s ease; }
-        .energy-stats { display: flex; justify-content: space-between; margin-top: 8px; font-size: 8px; font-weight: 800; color: #475569; letter-spacing: 1px; }
-
-        /* BOTTOM SECTION: Side Hustle (Hamesha Footer ke upar) */
-        .hustle-section { 
-            padding: 15px 0; 
-            text-align: center; 
-            flex-shrink: 0; 
-            background: transparent;
+        /* 3. NET WORTH BOX (HEADER) */
+        .header-box { 
+            width: 100%; padding: 20px; text-align: center;
+            flex-shrink: 0;
         }
-        .side-hustle-btn {
-            padding: 10px 30px; 
-            background: rgba(251, 191, 36, 0.05);
-            border: 1px solid rgba(251, 191, 36, 0.3); 
-            border-radius: 50px; color: #fbbf24;
-            font-size: 0.8rem; font-weight: 800; 
-            text-transform: uppercase; letter-spacing: 2px;
-            cursor: pointer;
-        }
-        .hustle-msg { font-size: 9px; color: #475569; margin-top: 8px; font-weight: 600; }
+        .nw-label { font-size: 0.65rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 2px; }
+        .nw-value { font-size: 3.5rem; font-weight: 900; color: #fbbf24; text-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
 
-        /* TAP ANIMATION */
-        .tap-anim { position: absolute; color: #fbbf24; font-weight: 900; font-size: 2rem; pointer-events: none; animation: floatUp 0.6s ease-out forwards; z-index: 100; }
-        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-150px); } }
+        /* 4. GAME AREA */
+        .game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        
+        #mainCoinBtn { font-size: 9rem; cursor: pointer; transition: 0.1s; user-select: none; filter: drop-shadow(0 0 30px rgba(0,0,0,0.8)); }
+        #mainCoinBtn:active { transform: scale(0.9); }
+
+        /* GOLD ENERGY BAR (Updated Logic) */
+        .energy-wrap { width: 85%; margin-top: 30px; }
+        .energy-bar-bg { width: 100%; height: 14px; background: rgba(0,0,0,0.6); border-radius: 30px; border: 1.5px solid rgba(251, 191, 36, 0.4); overflow: hidden; }
+        .energy-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #d97706, #fbbf24, #fef3c7); 
+            width: 100%; transition: 0.3s ease;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+        }
+        .energy-stats { display: flex; justify-content: space-between; margin-top: 10px; font-size: 10px; font-weight: 900; color: #fbbf24; letter-spacing: 1px; }
+
+        /* Tap Animation */
+        .tap-anim { position: absolute; color: #fbbf24; font-weight: 900; font-size: 2.5rem; pointer-events: none; animation: floatUp 0.6s ease-out forwards; text-shadow: 0 0 8px #000; }
+        @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-130px); } }
     </style>
 </head>
 <body>
 
     <div class="dashboard-container">
-        <div class="top-info">
-            <div class="mini-ad">AD BANNER SPACE</div>
+        <div class="global-ad-banner">PROMOTIONAL SPACE</div>
+
+        <div class="header-box">
             <p class="nw-label">NET WORTH</p>
-            <div id="coinCountDisplay" class="nw-value">--</div>
+            <div id="coinCountDisplay" class="nw-value">0</div>
         </div>
 
         <div class="game-area">
@@ -95,81 +74,86 @@
             <div class="energy-wrap">
                 <div class="energy-bar-bg"><div id="energyFill" class="energy-fill"></div></div>
                 <div class="energy-stats">
-                    <span>VITALITY</span>
-                    <span id="energyText">-- / --</span>
+                    <span>ENERGY</span> <span id="energyText">-- / --</span>
                 </div>
             </div>
-        </div>
-
-        <div class="hustle-section">
-            <button onclick="window.location.href='hustle.html'" class="side-hustle-btn">SIDE HUSTLE</button>
-            <p class="hustle-msg">Play minigames to earn more coins</p>
         </div>
     </div>
 
     <script src="settings.js"></script>
+
     <script>
-        function updateDashboard() {
-            let coins = Number(localStorage.getItem('vv_balance')) || 0;
-            const energy = Number(localStorage.getItem('vv_energy')) || 0;
-            const maxEnergy = Number(localStorage.getItem('vv_max_energy')) || 500;
+        // --- 5x5 ENERGY GRID LOGIC (Same as Setup) ---
+        const energyGrid = {
+            "Vada Pav & Chai": [500, 550, 600, 650, 700],
+            "Home Cooked Thali": [600, 750, 800, 850, 900],
+            "Fast Food & Drinks": [700, 850, 1000, 1100, 1150],
+            "Gourmet Dining": [800, 950, 1150, 1300, 1400],
+            "Private Chef Service": [900, 1050, 1250, 1400, 1500]
+        };
 
-            document.getElementById('coinCountDisplay').innerText = Math.floor(coins).toLocaleString();
+        const liveMap = { "Shared Dormitory": 0, "Co-Living Studio": 1, "City Center Flat": 2, "Luxury Penthouse": 3, "Private Mega Mansion": 4 };
+
+        function getMaxEnergy() {
+            // Profile page se ye values update hongi
+            const diet = localStorage.getItem('vv_diet_name') || "Vada Pav & Chai";
+            const living = localStorage.getItem('vv_live_name') || "Shared Dormitory";
             
-            const energyPercent = (energy / maxEnergy) * 100;
-            document.getElementById('energyFill').style.width = energyPercent + "%";
-            document.getElementById('energyText').innerText = `${Math.floor(energy)} / ${maxEnergy}`;
-        }
-
-        // Fix: Music on Interaction
-        function triggerAudio() {
-            if(window.audio && window.audio.bg.paused && localStorage.getItem('vv_music') !== 'off') {
-                window.audio.bg.play().catch(() => {});
+            try {
+                return energyGrid[diet][liveMap[living]] || 500;
+            } catch(e) {
+                return 500;
             }
         }
 
+        function formatBalance(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+            return Math.floor(num).toLocaleString();
+        }
+
+        function updateUI() {
+            let coins = Number(localStorage.getItem('vv_balance')) || 0;
+            const energy = Number(localStorage.getItem('vv_energy')) || 0;
+            const maxE = getMaxEnergy();
+            
+            document.getElementById('coinCountDisplay').innerText = formatBalance(coins);
+            document.getElementById('energyFill').style.width = (energy / maxE) * 100 + "%";
+            document.getElementById('energyText').innerText = `${Math.floor(energy)} / ${maxE}`;
+        }
+
         function handleTap(e) {
-            triggerAudio();
             let energy = Number(localStorage.getItem('vv_energy')) || 0;
             if (energy < 1) return;
 
             let coins = Number(localStorage.getItem('vv_balance')) || 0;
             localStorage.setItem('vv_balance', coins + 1);
             localStorage.setItem('vv_energy', energy - 1);
+            updateUI();
             
-            if(window.playSound) playSound('tap');
-            updateDashboard();
-
-            const f = document.createElement('div');
-            f.className = 'tap-anim';
-            f.innerText = '+1';
+            // Animation logic
+            const f = document.createElement('div'); f.className = 'tap-anim'; f.innerText = '+1';
             const x = e.touches ? e.touches[0].clientX : e.clientX;
             const y = e.touches ? e.touches[0].clientY : e.clientY;
-            f.style.left = (x - 25) + 'px';
-            f.style.top = (y - 50) + 'px';
-            document.body.appendChild(f);
-            setTimeout(() => f.remove(), 600);
+            f.style.left = (x - 20) + 'px'; f.style.top = (y - 40) + 'px';
+            document.body.appendChild(f); setTimeout(() => f.remove(), 600);
         }
 
         const btn = document.getElementById('mainCoinBtn');
         btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e); });
         btn.addEventListener('mousedown', (e) => { handleTap(e); });
 
-        // Logic Engine
+        // Energy Refill Engine
         setInterval(() => {
-            let coins = Number(localStorage.getItem('vv_balance')) || 0;
-            let exp = Number(localStorage.getItem('vv_hourly_exp')) || 0;
-            if(coins > 0) localStorage.setItem('vv_balance', coins - (exp / 3600));
-
             let energy = Number(localStorage.getItem('vv_energy')) || 0;
-            let maxE = Number(localStorage.getItem('vv_max_energy')) || 500;
-            // Refill Ultra Slow (0.02)
-            if(energy < maxE) localStorage.setItem('vv_energy', Math.min(maxE, energy + 0.02));
-
-            updateDashboard();
+            let maxE = getMaxEnergy();
+            if(energy < maxE) {
+                localStorage.setItem('vv_energy', Math.min(maxE, energy + 0.5));
+            }
+            updateUI();
         }, 1000);
 
-        updateDashboard();
+        updateUI();
     </script>
 </body>
 </html>
