@@ -5,24 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Virtual Ventures</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="login-style.css"> 
+    <style>
+        /* CSS RESET & SCROLL FIX */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        html, body {
+            height: 100%; width: 100%;
+            overflow: hidden; /* Scroll bilkul band */
+            background: #020617;
+            font-family: 'Inter', sans-serif;
+            color: white;
+        }
+
+        .screen {
+            width: 100%; 
+            height: 100vh;
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between; /* Isse top brand aur bottom container alag rahenge */
+            padding: 50px 20px 40px 20px; /* Top aur Bottom padding adjust ki hai */
+            
+            /* BACKGROUND FIX */
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('bg.png');
+            background-repeat: no-repeat;
+            background-size: cover; /* Poori screen cover karega */
+            background-position: center center;
+        }
+
+        /* TOP BRANDING */
+        .top-brand { text-align: center; width: 100%; }
+        
+        .main-title {
+            font-size: 2.8rem; 
+            color: #fbbf24; 
+            letter-spacing: 5px;
+            text-shadow: 3px 3px 15px rgba(0,0,0,0.8), 0 0 20px rgba(251, 191, 36, 0.4);
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .main-tagline {
+            font-size: 0.85rem; 
+            color: #fff; 
+            letter-spacing: 3px;
+            margin-top: 10px; 
+            font-weight: bold; 
+            text-shadow: 2px 2px 5px #000;
+            text-transform: uppercase;
+        }
+
+        /* BOTTOM CONTAINER */
+        .login-container {
+            width: 100%; 
+            max-width: 340px; 
+            text-align: center;
+            /* Isse ensure hoga ki ye navigation buttons ke niche na dhasse */
+            margin-bottom: env(safe-area-inset-bottom, 20px); 
+        }
+
+        .google-style-btn {
+            width: 100%; 
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #000; 
+            border: none; 
+            border-radius: 50px;
+            font-weight: 800; 
+            font-size: 1.1rem; 
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .google-style-btn:active { 
+            transform: scale(0.95); 
+            background: #eee; 
+        }
+
+        .dream-msg { 
+            margin-top: 20px; 
+            font-style: italic; 
+            font-size: 0.8rem; 
+            color: rgba(255,255,255,0.8);
+            text-shadow: 1px 1px 3px #000;
+            padding: 0 10px;
+        }
+
+        /* Chrome/Safari scrollbar hide */
+        ::-webkit-scrollbar { display: none; }
+    </style>
 </head>
 <body>
-    <div class="screen login-bg"> 
+
+    <div class="screen"> 
         <div class="top-brand">
             <h1 class="main-title">VIRTUAL</h1>
             <h1 class="main-title">VENTURES</h1>
             <p class="main-tagline">VIRTUAL ECONOMY, REAL FUN</p>
         </div>
-        <div class="login-container text-center">
+
+        <div class="login-container">
             <button id="startBtn" class="google-style-btn">START JOURNEY</button>
-            <p class="dream-msg" style="margin-top:20px; color:#94a3b8; font-size:12px;">"Every billionaire started with a single click."</p>
+            <p class="dream-msg">"Every billionaire started with a single click."</p>
         </div>
     </div>
 
     <script>
         document.getElementById('startBtn').onclick = () => {
-            // Agar setup ho chuka hai toh seedha game mein, warna Tutorial dikhao
+            // Check if setup is already done
             if (localStorage.getItem('vv_setup_done') === 'true') {
                 window.location.href = 'dashboard.html';
             } else {
@@ -30,10 +121,13 @@
             }
         };
 
-        // Auto-redirect for returning players
+        // Returning player check
         window.onload = () => {
             if (localStorage.getItem('vv_setup_done') === 'true') {
-                window.location.href = 'dashboard.html';
+                // Short delay for better UX
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 500);
             }
         };
     </script>
