@@ -5,63 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Dashboard | Virtual Ventures</title>
     <style>
-        /* CSS RESET */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Inter', sans-serif; }
 
-        /* 1. AD BANNER (Top branding ke theek niche) */
-        .global-ad-banner {
-            width: 100%; height: 45px; background: rgba(15, 23, 42, 0.8); 
-            border-bottom: 1px solid rgba(251, 191, 36, 0.3);
-            display: flex; align-items: center; justify-content: center;
-            color: #fbbf24; font-size: 0.65rem; font-weight: 800; 
-            letter-spacing: 2px; margin-top: 55px; /* Branding ke liye gap */
-            backdrop-filter: blur(10px);
-        }
-
-        /* 2. MAIN CONTAINER */
         .dashboard-container {
             display: flex; flex-direction: column; height: 100vh; width: 100%;
-            padding-bottom: 100px; /* Footer navigation ke liye space */
-            /* Background Opacity 0.4 taaki image dikhe */
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4), rgba(2, 6, 23, 0.8)), url('dashboard-bg.png');
+            /* BACKGROUND IMAGE */
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 0.7)), url('dashboard-bg.png');
             background-size: cover; background-position: center;
         }
 
-        /* 3. NET WORTH BOX (HEADER) */
-        .header-box { 
-            width: 100%; padding: 20px; text-align: center;
-            flex-shrink: 0;
+        /* 1. AD BANNER (Adjusted Niche) */
+        .global-ad-banner {
+            width: 92%; height: 45px; background: rgba(15, 23, 42, 0.9); 
+            border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fbbf24; font-size: 0.6rem; font-weight: 800; 
+            margin: 65px auto 10px auto; /* Branding ke niche aur gap */
+            backdrop-filter: blur(10px); z-index: 100;
         }
-        .nw-label { font-size: 0.65rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 4px; margin-bottom: 2px; }
-        .nw-value { font-size: 3.5rem; font-weight: 900; color: #fbbf24; text-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
 
-        /* 4. GAME AREA */
-        .game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        /* 2. NETWORTH BOX (Background added) */
+        .header-box { 
+            width: 92%; margin: 0 auto; padding: 15px; text-align: center;
+            background: rgba(15, 23, 42, 0.85); /* Solid background for clarity */
+            border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .nw-label { font-size: 0.6rem; color: #94a3b8; font-weight: 700; letter-spacing: 3px; margin-bottom: 2px; }
+        .nw-value { font-size: 2.8rem; font-weight: 900; color: #fbbf24; text-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
+
+        /* 3. GAME AREA */
+        .game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
-        #mainCoinBtn { font-size: 9rem; cursor: pointer; transition: 0.1s; user-select: none; filter: drop-shadow(0 0 30px rgba(0,0,0,0.8)); }
+        #mainCoinBtn { font-size: 8rem; cursor: pointer; transition: 0.1s; user-select: none; }
         #mainCoinBtn:active { transform: scale(0.9); }
 
-        /* GOLD ENERGY BAR (Updated Logic) */
-        .energy-wrap { width: 85%; margin-top: 30px; }
-        .energy-bar-bg { width: 100%; height: 14px; background: rgba(0,0,0,0.6); border-radius: 30px; border: 1.5px solid rgba(251, 191, 36, 0.4); overflow: hidden; }
-        .energy-fill { 
-            height: 100%; 
-            background: linear-gradient(90deg, #d97706, #fbbf24, #fef3c7); 
-            width: 100%; transition: 0.3s ease;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
-        }
-        .energy-stats { display: flex; justify-content: space-between; margin-top: 10px; font-size: 10px; font-weight: 900; color: #fbbf24; letter-spacing: 1px; }
+        /* ENERGY BAR */
+        .energy-wrap { width: 85%; margin-top: 20px; }
+        .energy-bar-bg { width: 100%; height: 12px; background: rgba(0,0,0,0.6); border-radius: 30px; border: 1px solid rgba(251, 191, 36, 0.4); overflow: hidden; }
+        .energy-fill { height: 100%; background: linear-gradient(90deg, #d97706, #fbbf24); width: 100%; transition: 0.3s ease; }
+        .energy-stats { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; font-weight: 900; color: #fbbf24; }
 
-        /* Tap Animation */
-        .tap-anim { position: absolute; color: #fbbf24; font-weight: 900; font-size: 2.5rem; pointer-events: none; animation: floatUp 0.6s ease-out forwards; text-shadow: 0 0 8px #000; }
+        /* 4. HUSTLE SECTION (Msg + Button) */
+        .hustle-section { padding-bottom: 110px; text-align: center; }
+        .hustle-msg { font-size: 0.65rem; color: #94a3b8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .side-hustle-btn {
+            padding: 12px 35px; background: #fbbf24; color: #020617;
+            border: none; border-radius: 50px; font-size: 0.8rem; font-weight: 900;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+        }
+
+        .tap-anim { position: absolute; color: #fbbf24; font-weight: 900; font-size: 2.5rem; pointer-events: none; animation: floatUp 0.6s ease-out forwards; }
         @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-130px); } }
     </style>
 </head>
 <body>
 
     <div class="dashboard-container">
-        <div class="global-ad-banner">PROMOTIONAL SPACE</div>
+        <div class="global-ad-banner">SPONSOR SPACE</div>
 
         <div class="header-box">
             <p class="nw-label">NET WORTH</p>
@@ -70,40 +72,37 @@
 
         <div class="game-area">
             <div id="mainCoinBtn">🟡</div>
-            
             <div class="energy-wrap">
                 <div class="energy-bar-bg"><div id="energyFill" class="energy-fill"></div></div>
-                <div class="energy-stats">
-                    <span>ENERGY</span> <span id="energyText">-- / --</span>
-                </div>
+                <div class="energy-stats"><span>ENERGY</span><span id="energyText">-- / --</span></div>
             </div>
+        </div>
+
+        <div class="hustle-section">
+            <p class="hustle-msg">Play minigames to earn more coins</p>
+            <button onclick="window.location.href='job.html'" class="side-hustle-btn">SIDE HUSTLE</button>
         </div>
     </div>
 
     <script src="settings.js"></script>
-
     <script>
-        // --- 5x5 ENERGY GRID LOGIC (Same as Setup) ---
-        const energyGrid = {
-            "Vada Pav & Chai": [500, 550, 600, 650, 700],
-            "Home Cooked Thali": [600, 750, 800, 850, 900],
-            "Fast Food & Drinks": [700, 850, 1000, 1100, 1150],
-            "Gourmet Dining": [800, 950, 1150, 1300, 1400],
-            "Private Chef Service": [900, 1050, 1250, 1400, 1500]
-        };
-
-        const liveMap = { "Shared Dormitory": 0, "Co-Living Studio": 1, "City Center Flat": 2, "Luxury Penthouse": 3, "Private Mega Mansion": 4 };
+        // --- 5x5 ENERGY REFILL LOGIC ---
+        // Kam energy wala (Vada Pav) slow refill hoga, Mehenga wala (Private Chef) fast!
+        function getRefillRate() {
+            const diet = localStorage.getItem('vv_diet_name') || "Vada Pav & Chai";
+            const rates = {
+                "Vada Pav & Chai": 0.3,       // Slowest
+                "Home Cooked Thali": 0.6,
+                "Fast Food & Drinks": 1.0, 
+                "Gourmet Dining": 1.5,
+                "Private Chef Service": 2.2    // Fastest
+            };
+            return rates[diet] || 0.5;
+        }
 
         function getMaxEnergy() {
-            // Profile page se ye values update hongi
-            const diet = localStorage.getItem('vv_diet_name') || "Vada Pav & Chai";
-            const living = localStorage.getItem('vv_live_name') || "Shared Dormitory";
-            
-            try {
-                return energyGrid[diet][liveMap[living]] || 500;
-            } catch(e) {
-                return 500;
-            }
+            const maxE = localStorage.getItem('vv_max_energy');
+            return maxE ? Number(maxE) : 500;
         }
 
         function formatBalance(num) {
@@ -116,7 +115,6 @@
             let coins = Number(localStorage.getItem('vv_balance')) || 0;
             const energy = Number(localStorage.getItem('vv_energy')) || 0;
             const maxE = getMaxEnergy();
-            
             document.getElementById('coinCountDisplay').innerText = formatBalance(coins);
             document.getElementById('energyFill').style.width = (energy / maxE) * 100 + "%";
             document.getElementById('energyText').innerText = `${Math.floor(energy)} / ${maxE}`;
@@ -125,13 +123,9 @@
         function handleTap(e) {
             let energy = Number(localStorage.getItem('vv_energy')) || 0;
             if (energy < 1) return;
-
-            let coins = Number(localStorage.getItem('vv_balance')) || 0;
-            localStorage.setItem('vv_balance', coins + 1);
+            localStorage.setItem('vv_balance', (Number(localStorage.getItem('vv_balance')) || 0) + 1);
             localStorage.setItem('vv_energy', energy - 1);
             updateUI();
-            
-            // Animation logic
             const f = document.createElement('div'); f.className = 'tap-anim'; f.innerText = '+1';
             const x = e.touches ? e.touches[0].clientX : e.clientX;
             const y = e.touches ? e.touches[0].clientY : e.clientY;
@@ -143,12 +137,13 @@
         btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e); });
         btn.addEventListener('mousedown', (e) => { handleTap(e); });
 
-        // Energy Refill Engine
+        // REFILL ENGINE based on Diet Selection
         setInterval(() => {
             let energy = Number(localStorage.getItem('vv_energy')) || 0;
             let maxE = getMaxEnergy();
+            let rate = getRefillRate(); // Diet ke base par speed change hogi
             if(energy < maxE) {
-                localStorage.setItem('vv_energy', Math.min(maxE, energy + 0.5));
+                localStorage.setItem('vv_energy', Math.min(maxE, energy + rate));
             }
             updateUI();
         }, 1000);
