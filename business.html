@@ -7,175 +7,207 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { 
-            height: 100%; overflow: hidden; background: #020617; 
-            color: white; font-family: 'Kanit', sans-serif; 
-        }
+        body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Kanit', sans-serif; }
+        .biz-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100%; padding-top: 70px; padding-bottom: 20px; background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.6), rgba(2, 6, 23, 0.9)), url('biz-bg.webp'); background-size: cover; }
+        .global-ad-banner { width: 92%; height: 50px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fbbf24; font-size: 0.7rem; font-weight: 800; margin: 0 auto 5px; letter-spacing: 2px; }
+        
+        /* NEW STATUS BOX */
+        .biz-stats-box { width: 92%; background: rgba(15, 23, 42, 0.95); border: 1px solid #fbbf24; border-radius: 15px; margin: 0 auto 15px; padding: 12px; display: flex; justify-content: space-around; align-items: center; text-align: center; }
+        .stat-item { flex: 1; }
+        .stat-val { display: block; font-weight: 900; font-size: 1.1rem; color: #fbbf24; }
+        .stat-lbl { font-size: 0.6rem; color: #94a3b8; letter-spacing: 1px; }
 
-        .biz-wrapper { 
-            display: flex; flex-direction: column; height: 100vh; width: 100%; 
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.9)), 
-                              url('biz-bg.webp'); 
-            background-size: cover; background-position: center;
-            padding-top: 70px; padding-bottom: 90px;
-        }
-
-        /* TOP AD BANNER */
-        .global-ad-banner {
-            width: 92%; height: 45px; background: rgba(15, 23, 42, 0.9); 
-            border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            color: #fbbf24; font-size: 0.65rem; font-weight: 800; 
-            margin: 0 auto 15px auto; backdrop-filter: blur(10px);
-            letter-spacing: 2px;
-        }
-
-        /* INCOME HEADER */
-        .stats-card {
-            width: 92%; margin: 0 auto 20px; padding: 15px;
-            background: rgba(15, 23, 42, 0.8); border-radius: 20px;
-            border: 1px solid rgba(251, 191, 36, 0.2); text-align: center;
-            backdrop-filter: blur(10px);
-        }
-        .stats-label { font-size: 0.7rem; color: #94a3b8; font-weight: 700; letter-spacing: 2px; }
-        .stats-value { font-size: 2rem; font-weight: 900; color: #fff; }
-
-        /* LIST VIEW */
         .biz-list { flex: 1; overflow-y: auto; padding: 0 15px; scrollbar-width: none; }
-        .biz-list::-webkit-scrollbar { display: none; }
+        .biz-card { background: rgba(15, 23, 42, 0.7); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); padding: 15px; margin-bottom: 12px; }
+        .btn-row { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-buy { flex: 2; background: #fbbf24; color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; }
+        .btn-buy:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+        .btn-sell { flex: 1; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; padding: 12px; border-radius: 12px; font-weight: 900; font-size: 0.7rem; cursor: pointer; }
+        
+        #adOverlay { position: fixed; inset: 0; background: #000; z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader { width: 50px; height: 50px; border: 5px solid #334155; border-top: 5px solid #fbbf24; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .biz-card {
-            background: rgba(15, 23, 42, 0.7); border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 15px; margin-bottom: 12px; display: flex; align-items: center;
-            gap: 15px; backdrop-filter: blur(15px);
-        }
-
-        .biz-icon { 
-            width: 60px; height: 60px; background: rgba(251, 191, 36, 0.1); 
-            border-radius: 15px; display: flex; align-items: center; 
-            justify-content: center; font-size: 1.8rem; border: 1px solid rgba(251, 191, 36, 0.2);
-        }
-
-        .biz-info { flex: 1; }
-        .biz-info h3 { font-size: 1.05rem; font-weight: 800; color: #fff; }
-        .biz-info p { font-size: 0.75rem; color: #fbbf24; font-weight: 700; }
-        .qty-badge { font-size: 0.65rem; color: #94a3b8; font-weight: 600; margin-top: 2px; }
-
-        .buy-btn {
-            background: #fbbf24; color: #020617; border: none;
-            padding: 10px 18px; border-radius: 12px; font-weight: 900;
-            font-size: 0.75rem; cursor: pointer; min-width: 90px;
-        }
-        .buy-btn:disabled { background: #1e293b; color: #475569; cursor: not-allowed; }
-        .price-text { display: block; font-size: 0.6rem; color: #94a3b8; text-align: center; margin-top: 5px; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #1e293b; width: 85%; padding: 25px; border-radius: 25px; border: 1px solid #fbbf24; text-align: center; }
     </style>
 </head>
 <body>
+    <div id="adOverlay">
+        <div class="loader"></div>
+        <h2 style="color:#fbbf24; margin-top:20px; letter-spacing:2px;">WATCHING VIDEO AD...</h2>
+    </div>
+
+    <div class="modal" id="sellModal">
+        <div class="modal-content">
+            <h3 style="color:#ef4444;">SELL BUSINESS?</h3>
+            <p id="sellDesc" style="font-size:0.8rem; color:#94a3b8; margin:15px 0;"></p>
+            <div style="display:flex; gap:10px;">
+                <button onclick="closeModal()" style="flex:1; padding:12px; background:#334155; color:white; border:none; border-radius:12px; font-weight:900;">NO</button>
+                <button id="confirmSellBtn" style="flex:1; padding:12px; background:#ef4444; color:white; border:none; border-radius:12px; font-weight:900;">YES, SELL</button>
+            </div>
+        </div>
+    </div>
 
     <div class="biz-wrapper">
-        <div class="global-ad-banner">PREMIUM SPONSOR AD</div>
-
-        <div class="stats-card">
-            <p class="stats-label">TOTAL PASSIVE INCOME</p>
-            <div id="totalIncome" class="stats-value">0/hr</div>
+        <div class="global-ad-banner">PREMIUM PARTNER SPONSOR</div>
+        
+        <div class="biz-stats-box">
+            <div class="stat-item">
+                <span id="topCoins" class="stat-val"> 0</span>
+                <span class="stat-lbl">CASH BALANCE</span>
+            </div>
+            <div style="width: 1px; height: 30px; background: rgba(251,191,36,0.3);"></div>
+            <div class="stat-item">
+                <span id="topIncome" class="stat-val"> 0/hr</span>
+                <span class="stat-lbl">INCOME FROM BUSINESS</span>
+            </div>
         </div>
 
-        <div class="biz-list" id="bizContainer">
-            </div>
+        <div id="bizContainer" class="biz-list"></div>
     </div>
 
     <script src="settings.js"></script>
     <script>
-        // Expanded Business List (50 Items)
-        const businesses = [
-            { id: 1, name: "Chai Tapri", icon: "☕", cost: 500, income: 45 },
-            { id: 2, name: "Pan Shop", icon: "🍃", cost: 1200, income: 110 },
-            { id: 3, name: "News Stand", icon: "📰", cost: 2500, income: 240 },
-            { id: 4, name: "Barber Shop", icon: "✂️", cost: 5000, income: 500 },
-            { id: 5, name: "Kirana Store", icon: "🛒", cost: 12000, income: 1300 },
-            { id: 6, name: "Juice Center", icon: "🥤", cost: 25000, income: 2800 },
-            { id: 7, name: "Gymnasium", icon: "🏋️", cost: 60000, income: 7000 },
-            { id: 8, name: "Cyber Cafe", icon: "🖥️", cost: 150000, income: 18000 },
-            { id: 9, name: "Pizza Outlet", icon: "🍕", cost: 400000, income: 50000 },
-            { id: 10, name: "Tech Startup", icon: "🚀", cost: 1000000, income: 130000 },
-            // ... Logic can dynamically generate more or you can add manually
+        const bizNames = [
+            "Chai Tapri", "Pan Shop", "Laundry", "Barber Shop", "Kirana Store", "Juice Center", "Gym", "Cyber Cafe", "Pizza Hut", "Tech Startup",
+            "Mobile Store", "Auto Garage", "Dairy Farm", "Sweet Shop", "Pharma Store", "Cinema Hall", "Fashion Label", "Watch Brand", "Jewelry Hub", "Real Estate",
+            "Bank Branch", "Cargo Fleet", "Power Grid", "Oil Refinery", "Space Agency", "Solar Farm", "Gaming Studio", "Crypto Mine", "Steel Mill", "Car Factory",
+            "Airport", "Shipyard", "Metro Rail", "Football Club", "Hospital", "University", "E-commerce", "AI Lab", "Hotel Chain", "Island Resort",
+            "Telecom", "Social Media", "Stock Exchange", "Military Tech", "Rocket Port", "Nuclear Plant", "Smart City", "Global Bank", "Moon Base", "Mars Colony"
         ];
+        const icons = ["☕", "🍃", "🧺", "✂️", "🛒", "🥤", "🏋️", "🖥️", "🍕", "🚀", "📱", "🔧", "🥛", "🍩", "💊", "🎬", "👗", "⌚", "💎", "🏗️", "🏦", "🚛", "⚡", "🛢️", "🛰️", "☀️", "🎮", "⛏️", "🏭", "🏎️", "✈️", "🚢", "🚇", "⚽", "🏥", "🎓", "📦", "🤖", "🏨", "🏝️", "📡", "🌐", "📈", "🛡️", "🚁", "☢️", "🏙️", "🏛️", "🌑", "🛸"];
 
-        // Dyanmic generation for 50 items to keep code clean
-        const icons = ["🏭", "🏨", "🏥", "🏢", "🚢", "✈️", "💎", "🔋", "📡", "🛰️"];
-        const names = ["Steel Factory", "Grand Resort", "Private Clinic", "IT Park", "Shipping Line", "Airlines", "Diamond Mine", "Solar Farm", "Data Center", "Space Tourism"];
-        
-        for(let i=11; i<=50; i++){
-            let prev = businesses[i-2];
-            businesses.push({
-                id: i,
-                name: names[i%10] + " " + (Math.floor(i/10) + 1),
-                icon: icons[i%10],
-                cost: Math.floor(prev.cost * 2.2),
-                income: Math.floor(prev.income * 2.1)
-            });
-        }
+        let businesses = bizNames.map((name, i) => ({
+            id: i + 1,
+            name: name,
+            icon: icons[i],
+            cost: Math.floor(500 * Math.pow(1.6, i)),
+            income: Math.floor(45 * Math.pow(1.5, i))
+        }));
 
-        function formatVal(num) {
-            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-            if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
-            return num.toLocaleString();
-        }
-
-        function renderBiz() {
+        function render() {
     const container = document.getElementById('bizContainer');
     const myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
     const coins = Number(localStorage.getItem('vv_balance')) || 0;
-    let totalHrIncome = 0;
-
     let html = '';
-    businesses.forEach(b => {
-        const owned = myBiz.find(item => item.id === b.id);
-        const count = owned ? owned.count : 0;
-        totalHrIncome += (count * b.income);
+    let totalIncome = 0;
 
-        html += `
-            <div class="biz-card">
-                <div class="biz-icon">${b.icon}</div>
-                <div class="biz-info">
-                    <h3>${b.name}</h3>
-                    <p>+${window.formatBalance(b.income)}/hr</p>
-                    <div class="qty-badge">OWNED: ${count}</div>
-                </div>
-                <div class="buy-section">
-                    <button class="buy-btn" onclick="buyBiz(${b.id})" ${coins < b.cost ? 'disabled' : ''}>BUY</button>
-                    <span class="price-text">🟡 ${window.formatBalance(b.cost)}</span>
-                </div>
-            </div>
-        `;
+    // FIX: Total Income calculation ko sahi kiya
+    myBiz.forEach(m => {
+        const originalBiz = businesses.find(b => b.id === m.id);
+        if (originalBiz) {
+            // Level 1 par base income, higher levels par 25% extra per level
+            const bizIncome = m.count > 0 ? originalBiz.income + (originalBiz.income * 0.25 * (m.count - 1)) : 0;
+            totalIncome += bizIncome;
+        }
     });
 
-    container.innerHTML = html;
-    document.getElementById('totalIncome').innerText = window.formatBalance(totalHrIncome) + "/hr";
-}
+    // UI Update (Coin symbol remove kar diya aapke kahe mutabiq)
+    document.getElementById('topCoins').innerText = `${window.formatBalance(coins)}`;
+    document.getElementById('topIncome').innerText = `${window.formatBalance(totalIncome)}/hr`;
 
-        window.buyBiz = function(id) {
-            let coins = Number(localStorage.getItem('vv_balance')) || 0;
-            const bData = businesses.find(b => b.id === id);
-            
-            if (coins >= bData.cost) {
-                localStorage.setItem('vv_balance', coins - bData.cost);
-                let myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
-                const idx = myBiz.findIndex(i => i.id === id);
-                
-                if (idx > -1) myBiz[idx].count++;
-                else myBiz.push({ id: id, count: 1, income: bData.income });
-                
-                localStorage.setItem('vv_biz', JSON.stringify(myBiz));
-                if(window.playSound) window.playSound('tap');
-                renderBiz();
+    // ... baaki businesses.forEach wala code same rahega ...
+
+            businesses.forEach(b => {
+                const owned = myBiz.find(m => m.id === b.id);
+                const lvl = owned ? owned.count : 0;
+                const inflation = window.getInflationRate(); 
+                const price = Math.floor(b.cost * inflation * Math.pow(2.1, lvl));
+                const currentInc = lvl > 0 ? b.income + (b.income * 0.25 * (lvl-1)) : b.income;
+
+                html += `
+                <div class="biz-card">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div style="font-size:1.5rem;">${b.icon}</div>
+                        <div style="flex:1">
+                            <h3 style="font-size:0.9rem;">${b.name}</h3>
+                            <p style="color:#fbbf24; font-size:0.75rem;">+${window.formatBalance(currentInc)}/hr</p>
+                        </div>
+                        <div style="text-align:right">
+                            <span style="font-size:0.5rem; color:#94a3b8">LEVEL</span>
+                            <div style="font-weight:900;">${lvl}/10</div>
+                        </div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn-buy" onclick="handleAction(${b.id}, ${price}, ${lvl})" ${coins < price || lvl >= 10 ? 'disabled' : ''}>
+                            ${lvl === 0 ? 'BUY' : 'UPGRADE'} ( ${window.formatBalance(price)})
+                        </button>
+                        ${lvl > 0 ? `<button class="btn-sell" onclick="confirmSell(${b.id})">SELL</button>` : ''}
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        window.handleAction = function(id, price, lvl) {
+            if (lvl === 0) {
+                executeUpgrade(id, price);
+            } else {
+                document.getElementById('adOverlay').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('adOverlay').style.display = 'none';
+                    executeUpgrade(id, price);
+                }, 4000);
             }
         };
 
-        // Live update UI every second
-        setInterval(renderBiz, 1000);
-        renderBiz();
+        function executeUpgrade(id, price) {
+            let coins = Number(localStorage.getItem('vv_balance')) || 0;
+            let myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
+            const bizData = businesses.find(b => b.id === id);
+            const idx = myBiz.findIndex(m => m.id === id);
+
+            if (coins >= price) {
+                localStorage.setItem('vv_balance', coins - price);
+                if(idx > -1) {
+                    myBiz[idx].count++;
+                    myBiz[idx].totalInvested = (myBiz[idx].totalInvested || 0) + price;
+                } else {
+                    myBiz.push({ 
+                        id: id, 
+                        count: 1, 
+                        buyPrice: price, 
+                        totalInvested: price,
+                        income: bizData.income // Store base income for finance engine
+                    });
+                }
+                localStorage.setItem('vv_biz', JSON.stringify(myBiz));
+                render();
+            }
+        }
+
+        window.confirmSell = function(id) {
+            const myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
+            const item = myBiz.find(m => m.id === id);
+            const refund = Math.floor((item.totalInvested || 0) * 0.75);
+            
+            document.getElementById('sellDesc').innerHTML = `Get 75% refund of your investment:<br><span style="color:#fbbf24; font-size:1.2rem;"> ${window.formatBalance(refund)}</span>`;
+            
+            document.getElementById('confirmSellBtn').onclick = () => {
+                document.getElementById('adOverlay').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('adOverlay').style.display = 'none';
+                    let coins = Number(localStorage.getItem('vv_balance')) || 0;
+                    localStorage.setItem('vv_balance', coins + refund);
+                    const newList = myBiz.filter(m => m.id !== id);
+                    localStorage.setItem('vv_biz', JSON.stringify(newList));
+                    document.getElementById('sellModal').style.display = 'none';
+                    render();
+                }, 4000);
+            };
+            document.getElementById('sellModal').style.display = 'flex';
+        };
+
+        window.closeModal = function() {
+            document.getElementById('adOverlay').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('adOverlay').style.display = 'none';
+                document.getElementById('sellModal').style.display = 'none';
+            }, 4000);
+        };
+
+        render();
     </script>
 </body>
 </html>

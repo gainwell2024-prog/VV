@@ -2,215 +2,189 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Color Pro | Virtual Ventures</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background: #020617; 
-            color: #f1f1f1; 
-            font-family: 'Kanit', sans-serif; 
-            height: 100dvh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            padding: 15px;
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.98)), url('background-image.png');
-            background-size: cover;
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body, html { 
+            height: 100dvh; width: 100vw; overflow: hidden !important; 
+            background: #020617; color: white; font-family: 'Kanit', sans-serif; position: fixed;
         }
-        
-        .gold-text { color: #fbbf24; }
-        .royal-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(15px); border: 1px solid rgba(251, 191, 36, 0.2); }
-        
-        #gameArea { 
-            flex: 1; 
-            background: rgba(15, 23, 42, 0.5); 
-            border: 2px solid rgba(251, 191, 36, 0.1); 
-            border-radius: 24px; 
-            position: relative; 
-            overflow: hidden; 
-            margin-bottom: 15px; 
-        }
-        
-        .ball { 
-            width: 50px; height: 50px; 
-            border-radius: 50%; 
-            position: absolute; 
-            left: 50%; transform: translateX(-50%); 
-            box-shadow: 0 0 20px rgba(0,0,0,0.5); 
-            z-index: 10; 
-            border: 3px solid rgba(255,255,255,0.4); 
-        }
-        
-        .btn-color { 
-            height: 65px; 
-            border-radius: 18px; 
-            border: 2px solid rgba(255,255,255,0.1); 
-            transition: transform 0.1s; 
-        }
-        .btn-color:active { transform: scale(0.9); }
 
-        #endPopup, #adOverlay { display: none; position: fixed; inset: 0; z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
-        #adOverlay { background: #020617; flex-direction: column; }
-        #endPopup { background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); }
+        .game-wrapper {
+            display: flex; flex-direction: column; height: 100dvh; width: 100%;
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4), rgba(2, 6, 23, 0.7)), url('color-game-bg.webp');
+            background-size: cover; background-position: center;
+            padding-top: 70px; align-items: center;
+        }
+
+        .ad-banner {
+            width: 90%; height: 45px; background: rgba(15, 23, 42, 0.9);
+            margin-bottom: 20px; border-radius: 12px; border: 1px solid rgba(251, 191, 36, 0.4);
+            display: flex; align-items: center; justify-content: center;
+            color: #fbbf24; font-size: 0.65rem; font-weight: 800; letter-spacing: 2px;
+        }
+
+        .stats-top { 
+            display: flex; justify-content: space-between; width: 85%; 
+            margin-bottom: 10px; color: #fff; font-size: 1rem; font-weight: 900;
+        }
+
+        #gameCanvas { width: 100%; height: 50%; position: relative; overflow: hidden; }
         
-        .v-progress { height: 100%; background: #fbbf24; width: 0%; transition: linear; }
+        .ball {
+            position: absolute; width: 50px; height: 50px; border-radius: 50%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            border: 3px solid rgba(255,255,255,0.5);
+            left: 50%; transform: translateX(-50%);
+        }
+
+        .color-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;
+            width: 92%; margin-top: 40px; padding: 15px;
+            background: rgba(15, 23, 42, 0.8); border-radius: 25px;
+            backdrop-filter: blur(15px); border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .color-btn {
+            aspect-ratio: 1/1; border-radius: 15px; border: 2px solid rgba(255,255,255,0.1);
+            cursor: pointer; transition: 0.1s;
+        }
+        .color-btn:active { transform: scale(0.8); }
+
+        /* MODAL */
+        .modal { position: fixed; inset: 0; background: rgba(2,6,23,0.96); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: #1e293b; width: 100%; max-width: 320px; border-radius: 30px; border: 2px solid #fbbf24; padding: 30px; text-align: center; }
+        .modal-btn { width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: 900; margin-top: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="adOverlay">
-        <div class="w-16 h-16 border-4 border-white/5 border-t-yellow-400 rounded-full animate-spin mb-6"></div>
-        <p class="gold-text font-black tracking-widest uppercase text-xs animate-pulse">Syncing Session...</p>
-        <div id="adTimerOverlay" class="mt-4 text-white font-black text-6xl">3</div>
-    </div>
+    <div class="game-wrapper">
+        <div class="ad-banner">PREMIUM SPONSOR AD</div>
 
-    <nav class="flex items-center justify-between mb-3">
-        <button onclick="window.location.href='jobs.html'" class="text-white text-xl"><i class="fas fa-chevron-left"></i></button>
-        <h1 class="text-lg font-black gold-text uppercase italic">Color Pro</h1>
-        <div class="w-8"></div>
-    </nav>
-
-    <div class="flex justify-between items-center px-4 py-3 mb-3 royal-card rounded-2xl">
-        <div class="flex flex-col">
-            <span class="text-[8px] text-gray-400 font-bold uppercase">Profit</span>
-            <div class="flex items-center gap-1.5 leading-none">
-                <i class="fas fa-coins gold-text text-sm"></i>
-                <span id="score" class="text-xl font-black text-white">0</span>
-            </div>
+        <div class="stats-top">
+            <span>SCORE: <span id="scoreText">0</span></span>
+            <span style="color:#fbbf24">COINS: <span id="coinText">0</span></span>
         </div>
-        <div class="flex flex-col items-end">
-            <span class="text-[8px] text-gray-400 font-bold uppercase">Market Close In</span>
-            <div class="flex items-center gap-1.5 leading-none">
-                <i class="fas fa-clock text-blue-400 text-sm"></i>
-                <span id="timerText" class="text-xl font-black text-white">45s</span>
-            </div>
-        </div>
+
+        <div id="gameCanvas"></div>
+
+        <div class="color-grid" id="controls"></div>
+        <p style="margin-top:20px; font-size:0.7rem; color:#94a3b8; font-weight:700;">WRONG CLICK = GAME OVER</p>
     </div>
 
-    <div id="gameArea">
-        <div id="fallingBall" class="ball" style="top: -60px;"></div>
-    </div>
-
-    <div class="pb-6 grid grid-cols-5 gap-2">
-        <button onclick="checkColor('red')" class="btn-color bg-red-500"></button>
-        <button onclick="checkColor('blue')" class="btn-color bg-blue-600"></button>
-        <button onclick="checkColor('green')" class="btn-color bg-green-500"></button>
-        <button onclick="checkColor('yellow')" class="btn-color bg-yellow-400"></button>
-        <button onclick="checkColor('purple')" class="btn-color bg-purple-600"></button>
-    </div>
-
-    <div id="endPopup">
-        <div class="w-full max-w-xs royal-card p-8 rounded-[2.5rem] text-center shadow-2xl">
-            <div id="syncSection">
-                <i class="fas fa-satellite-dish gold-text text-4xl mb-4"></i>
-                <h2 class="text-xl font-black uppercase text-white">Processing Coins</h2>
-                <div class="my-6 bg-black/20 py-4 rounded-2xl px-6">
-                    <div class="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div id="vProgress" class="v-progress"></div>
-                    </div>
-                    <p id="syncMsg" class="text-[8px] text-gray-400 uppercase mt-3 font-black tracking-widest">Uploading to Cloud...</p>
-                </div>
+    <div class="modal" id="finishModal">
+        <div class="modal-content">
+            <div id="modalIcon" style="font-size: 3.5rem; margin-bottom: 10px;">✅</div>
+            <h2 id="modalTitle" style="font-weight: 900; letter-spacing: 1px; color: #fff;">WORK COMPLETE</h2>
+            <p id="modalMsg" style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 20px;">Precision is key to wealth. Earnings synced.</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; margin-bottom: 25px;">
+                <span style="color: #94a3b8; font-size: 0.7rem;">TOTAL REWARD</span>
+                <div id="finalRewardText" style="font-size: 2.2rem; font-weight: 900; color: #fbbf24;">🟡 0</div>
             </div>
-
-            <div id="resultSection" class="hidden">
-                <i id="endIcon" class="fas fa-coins gold-text text-6xl mb-4"></i>
-                <h2 id="endStatus" class="text-2xl font-black uppercase text-white">Market Closed</h2>
-                <div class="my-5 bg-black/30 py-4 rounded-3xl border border-white/5">
-                    <p id="finalCoins" class="text-5xl font-black gold-text">0</p>
-                    <p class="text-[10px] font-bold text-gray-500 uppercase mt-1">Total Reward Added</p>
-                </div>
-                <div class="space-y-3">
-                    <button onclick="playAgainWithAd()" class="w-full py-4 rounded-xl font-black uppercase text-sm bg-yellow-400 text-black">Trade Again</button>
-                    <button onclick="window.location.href='jobs.html'" class="w-full bg-white/5 text-white py-3 rounded-xl font-black uppercase text-xs border border-white/10">More Jobs</button>
-                </div>
-            </div>
+            <button class="modal-btn" style="background:#fbbf24; color:#020617;" onclick="location.href='jobs.html'">BACK TO JOBS</button>
+            <button class="modal-btn" style="background:transparent; color:#94a3b8; border:1px solid #334155; margin-top:15px;" onclick="location.href='dashboard.html'">DASHBOARD</button>
         </div>
     </div>
 
     <script src="settings.js"></script>
     <script>
-        let score = 0, ballPos = -60, speed = 4.0, timeLeft = 45;
-        let gameActive = true, currentColor = '';
-        const colors = ['red', 'blue', 'green', 'yellow', 'purple'];
-        const ball = document.getElementById('fallingBall');
-        const gameArea = document.getElementById('gameArea');
+        const colorSet = [
+            { hex: '#ef4444' }, // Red
+            { hex: '#3b82f6' }, // Blue
+            { hex: '#22c55e' }, // Green
+            { hex: '#eab308' }, // Yellow
+            { hex: '#a855f7' }  // Purple
+        ];
 
-        function resetBall() {
-            ballPos = -60;
-            currentColor = colors[Math.floor(Math.random() * colors.length)];
-            const colorMap = { 'red': 'bg-red-500', 'blue': 'bg-blue-600', 'green': 'bg-green-500', 'yellow': 'bg-yellow-400', 'purple': 'bg-purple-600' };
-            ball.className = `ball ${colorMap[currentColor]}`;
-            speed += 0.15; 
+        let score = 0;
+        let earnedCoins = 0;
+        let gameActive = true;
+        let currentBallHex = null;
+        let ballInterval = null;
+        let baseSpeed = 3.5; // Starting speed
+
+        function init() {
+            createButtons();
+            spawnBall();
         }
 
-        function gameLoop() {
+        function createButtons() {
+            const container = document.getElementById('controls');
+            colorSet.forEach(c => {
+                const btn = document.createElement('div');
+                btn.className = 'color-btn';
+                btn.style.backgroundColor = c.hex;
+                btn.onclick = () => handleInput(c.hex);
+                container.appendChild(btn);
+            });
+        }
+
+        function spawnBall() {
             if(!gameActive) return;
-            ballPos += speed;
-            ball.style.top = ballPos + "px";
-            if (ballPos > gameArea.offsetHeight - 50) {
-                endGame("Out of Bounds", "fas fa-times-circle text-red-500");
-            } else {
-                requestAnimationFrame(gameLoop);
-            }
-        }
-
-        function checkColor(clickedColor) {
-            if(!gameActive) return;
-            if (clickedColor === currentColor) {
-                score += 10; // Har sahi match par 10 coins
-                document.getElementById('score').innerText = score;
-                resetBall();
-            } else {
-                endGame("Wrong Signal!", "fas fa-bolt text-yellow-500");
-            }
-        }
-
-        function endGame(status, icon) {
-            gameActive = false;
-            document.getElementById('endStatus').innerText = status;
-            document.getElementById('endIcon').className = icon + " text-6xl mb-4";
-            document.getElementById('endPopup').style.display = "flex";
-            document.getElementById('finalCoins').innerText = score;
-
-            const progress = document.getElementById('vProgress');
-            const msgEl = document.getElementById('syncMsg');
-            const msgs = ["Securing Transaction...", "Verifying Profit...", "Updating Potli...", "Done!"];
+            const canvas = document.getElementById('gameCanvas');
+            canvas.innerHTML = ''; 
             
-            progress.style.transition = "3s linear";
-            setTimeout(() => progress.style.width = "100%", 50);
-            msgs.forEach((m, i) => setTimeout(() => { msgEl.innerText = m; }, i * 800));
+            const ball = document.createElement('div');
+            const randomColor = colorSet[Math.floor(Math.random() * colorSet.length)];
+            currentBallHex = randomColor.hex;
 
-            setTimeout(() => {
-                let current = Number(localStorage.getItem('vv_coins')) || 0;
-                localStorage.setItem('vv_coins', current + score);
-                document.getElementById('syncSection').classList.add('hidden');
-                document.getElementById('resultSection').classList.remove('hidden');
-            }, 3200);
+            ball.className = 'ball';
+            ball.style.backgroundColor = randomColor.hex;
+            ball.style.top = '-60px';
+            canvas.appendChild(ball);
+
+            let pos = -60;
+            // DANGER SPEED LOGIC: Rapidly increases after 150 score
+            let currentSpeed = baseSpeed + (score * 0.15); 
+            if(score > 200) currentSpeed = baseSpeed + (score * 0.4); // Near Impossible after 200
+
+            ballInterval = setInterval(() => {
+                if(!gameActive) { clearInterval(ballInterval); return; }
+                pos += currentSpeed;
+                ball.style.top = pos + 'px';
+
+                if(pos > canvas.offsetHeight) {
+                    clearInterval(ballInterval);
+                    endGame("MISSED IT!", "❌"); // Missing is also Game Over
+                }
+            }, 16);
         }
 
-        function playAgainWithAd() {
-            document.getElementById('endPopup').style.display = 'none';
-            document.getElementById('adOverlay').style.display = 'flex';
-            let left = 3;
-            let int = setInterval(() => {
-                left--; document.getElementById('adTimerOverlay').innerText = left;
-                if(left <= 0) { clearInterval(int); location.reload(); }
-            }, 1000);
-        }
-
-        // Timer Logic
-        let timerInterval = setInterval(() => {
+        function handleInput(clickedHex) {
             if(!gameActive) return;
-            timeLeft--;
-            document.getElementById('timerText').innerText = timeLeft + "s";
-            if(timeLeft <= 0) endGame("Market Closed", "fas fa-clock text-blue-400");
-        }, 1000);
+            
+            if(clickedHex === currentBallHex) {
+                score++;
+                earnedCoins += 10;
+                document.getElementById('scoreText').innerText = score;
+                document.getElementById('coinText').innerText = earnedCoins;
+                if(window.playSound) window.playSound('tap');
+                
+                clearInterval(ballInterval);
+                spawnBall();
+            } else {
+                endGame("WRONG COLOR!", "⚠️");
+            }
+        }
 
-        resetBall();
-        requestAnimationFrame(gameLoop);
+        function endGame(reason, icon) {
+            gameActive = false;
+            clearInterval(ballInterval);
+            
+            // Sync to wallet
+            let bal = Number(localStorage.getItem('vv_balance')) || 0;
+            localStorage.setItem('vv_balance', bal + earnedCoins);
+            
+            document.getElementById('modalTitle').innerText = reason;
+            document.getElementById('modalIcon').innerText = icon;
+            document.getElementById('finalRewardText').innerText = "🟡 " + (window.formatBalance ? window.formatBalance(earnedCoins) : earnedCoins);
+            document.getElementById('finishModal').style.display = 'flex';
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>

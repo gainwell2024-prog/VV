@@ -7,7 +7,7 @@ const universalStyles = `
     ::-webkit-scrollbar { display: none !important; }
     
     .header-bar { padding: 0 20px; display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.9); height: 60px; border-bottom: 2px solid #fbbf24; width: 100%; position: fixed; top:0; z-index: 100; }
-    .game-logo-text { font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; color: #fbbf24; italic; }
+    .game-logo-text { font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; color: #fbbf24; font-style: italic; }
     
     .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #0f172a; display: flex; justify-content: space-around; padding: 12px 0; border-top: 2px solid #1e293b; z-index: 100; }
     .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 0.65rem; gap: 4px; transition: 0.3s; font-weight: bold; }
@@ -27,25 +27,32 @@ const universalStyles = `
 
 document.head.insertAdjacentHTML('beforeend', universalStyles);
 
-// UNIVERSAL NUMBER FORMATTER
+// 2. UNIVERSAL NUMBER FORMATTER (No symbols, NaN protection)
 window.formatBalance = function(num) {
+    if (num === null || num === undefined || isNaN(num)) return "0";
     let negative = num < 0;
-    num = Math.abs(num);
-    if (num < 1000) return (negative ? "-" : "") + Math.floor(num).toString();
-    const suffixes = ["", "k", "M", "B", "T", "Q", "Qi", "Sx", "Sp"];
-    const suffixNum = Math.floor(("" + Math.floor(num)).length / 3);
-    let shortValue = parseFloat((suffixNum != 0 ? (num / Math.pow(1000, suffixNum)) : num).toPrecision(3));
-    if (shortValue % 1 != 0) shortValue = shortValue.toFixed(2);
-    return (negative ? "-" : "") + (suffixes[suffixNum] !== undefined ? shortValue + suffixes[suffixNum] : num.toExponential(2));
+    let absNum = Math.abs(num);
+    
+    let formatted = "";
+    if (absNum < 1000) {
+        formatted = Math.floor(absNum).toString();
+    } else {
+        const suffixes = ["", "k", "M", "B", "T", "Q"];
+        const suffixNum = Math.floor(("" + Math.floor(absNum)).length / 3);
+        let shortValue = parseFloat((suffixNum != 0 ? (absNum / Math.pow(1000, suffixNum)) : absNum).toPrecision(3));
+        if (shortValue % 1 != 0) shortValue = shortValue.toFixed(2);
+        formatted = shortValue + suffixes[suffixNum];
+    }
+    return (negative ? "-" : "") + formatted;
 };
 
-// --- AUDIO & UI INJECTION (Common Logic) ---
+// 3. AUDIO & UI INJECTION
 const audio = { bg: new Audio('bg-music.mp3'), tap: new Audio('tap.mp3') };
 audio.bg.loop = true;
 
 window.playSound = (type) => {
     if (localStorage.getItem('vv_sound') !== 'off') {
-        if(type === 'tap') { audio.tap.currentTime = 0; audio.tap.play(); }
+        if(type === 'tap') { audio.tap.currentTime = 0; audio.tap.play().catch(()=>{}); }
     }
 }
 
@@ -90,26 +97,25 @@ function renderSettings() {
 }
 injectUI();
 
-// --- FINANCE ENGINE (Income, Tax, Expenses) ---
+// 4. FINANCE ENGINE (Calculation Fix)
 function processFinances() {
     const lastCheck = localStorage.getItem('vv_last_finance_check');
     const now = Date.now();
     
-    // Calculate Hourly Income
     const myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
-    const hourlyIncome = myBiz.reduce((total, biz) => total + (biz.count * biz.income), 0);
+    // Important: Biz income match from logic
+    const hourlyIncome = myBiz.reduce((total, biz) => {
+        const income = biz.income || 0;
+        const levelBonus = biz.count > 1 ? (income * 0.25 * (biz.count - 1)) : 0;
+        return total + (biz.count * (income + levelBonus));
+    }, 0);
     
-    // Calculate Hourly Expenses
     const dietCost = Number(localStorage.getItem('vv_diet_cost')) || 10;
     const liveCost = Number(localStorage.getItem('vv_live_cost')) || 20;
     const transCost = Number(localStorage.getItem('vv_trans_cost')) || 0;
     const totalHourlyExpense = dietCost + liveCost + transCost;
 
-    // Tax Logic
-    let taxRate = 0;
-    if (hourlyIncome > 1000000000) taxRate = 0.20;
-    else if (hourlyIncome > 1000000) taxRate = 0.10;
-    
+    let taxRate = hourlyIncome > 1000000000 ? 0.20 : (hourlyIncome > 1000000 ? 0.10 : 0);
     const hourlyTax = hourlyIncome * taxRate;
     const netHourly = hourlyIncome - totalHourlyExpense - hourlyTax;
 
@@ -118,7 +124,7 @@ function processFinances() {
         if (secondsPassed > 0) {
             const netEarned = (netHourly / 3600) * secondsPassed;
             let currentBalance = Number(localStorage.getItem('vv_balance')) || 0;
-            localStorage.setItem('vv_balance', Math.max(0, currentBalance + netEarned));
+            localStorage.setItem('vv_balance', currentBalance + netEarned);
 
             if (secondsPassed > 300) showFinancePopup(netEarned, secondsPassed);
         }
@@ -136,7 +142,7 @@ function showFinancePopup(amount, seconds) {
             <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:15px;">Report for last ${(seconds/3600).toFixed(1)} hours</p>
             <div style="background:rgba(255,255,255,0.05); border-radius:15px; padding:15px; margin-bottom:20px;">
                 <span style="color:${isLoss ? '#ef4444' : '#4ade80'}; font-size:1.8rem; font-weight:900;">${window.formatBalance(amount)}</span>
-                <p style="font-size:0.6rem; color:#64748b; margin-top:5px;">(After Taxes & Lifestyle Expenses)</p>
+                <p style="font-size:0.6rem; color:#64748b; margin-top:5px;">(Net Profit/Loss)</p>
             </div>
             <button onclick="document.getElementById('financeModal').remove()" style="width:100%; background:#fbbf24; color:#020617; border:none; padding:15px; border-radius:15px; font-weight:900;">COLLECT</button>
         </div>
@@ -144,7 +150,7 @@ function showFinancePopup(amount, seconds) {
     document.body.insertAdjacentHTML('beforeend', popupHtml);
 }
 
-// --- ENERGY ENGINE ---
+// 5. ENERGY ENGINE
 function syncEnergy() {
     const lastCheck = localStorage.getItem('vv_last_energy_check');
     const now = Date.now();
@@ -162,5 +168,31 @@ function syncEnergy() {
     localStorage.setItem('vv_last_energy_check', now);
 }
 
-setInterval(() => { processFinances(); syncEnergy(); }, 300000);
-processFinances(); syncEnergy();
+// 6. INFLATION ENGINE
+function applyInflation() {
+    const lastUpdate = localStorage.getItem('vv_last_inflation_date');
+    const now = Date.now();
+    if (!lastUpdate) {
+        localStorage.setItem('vv_last_inflation_date', now);
+        localStorage.setItem('vv_inflation_rate', 1.15);
+        return;
+    }
+    if (now - Number(lastUpdate) >= 86400000) {
+        let currentRate = Number(localStorage.getItem('vv_inflation_rate')) || 1.15;
+        let dailyRise = (Math.random() * (0.035 - 0.015) + 0.015);
+        localStorage.setItem('vv_inflation_rate', currentRate + dailyRise);
+        localStorage.setItem('vv_last_inflation_date', now);
+    }
+}
+window.getInflationRate = () => Number(localStorage.getItem('vv_inflation_rate')) || 1.15;
+
+// 7. EXECUTION (The 2-second Delay fix)
+setTimeout(() => {
+    processFinances(); 
+    syncEnergy();
+    applyInflation();
+    setInterval(() => { 
+        processFinances(); 
+        syncEnergy(); 
+    }, 60000); // Background sync every 1 minute
+}, 2000);

@@ -2,223 +2,215 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>2048 Wealth | Virtual Ventures</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Kanit', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: #020617; color: #fff; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; padding: 15px; }
-        
-        .gold-text { color: #fbbf24; }
-        .royal-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(15px); border: 1px solid rgba(251, 191, 36, 0.2); }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; touch-action: none; }
+        body, html { 
+            height: 100dvh; width: 100vw; overflow: hidden !important; 
+            background: #020617; color: white; font-family: 'Kanit', sans-serif; position: fixed;
+        }
 
-        /* 2048 Grid Styling */
-        #grid-container {
-            width: 320px; height: 320px;
-            background: #1e293b;
-            border-radius: 15px;
-            padding: 10px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 10px;
-            margin: 20px auto;
-            position: relative;
-            touch-action: none; /* Prevent scrolling while playing */
+        .game-wrapper {
+            display: flex; flex-direction: column; height: 100dvh; width: 100%;
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.8)), url('2048-game-bg.webp');
+            background-size: cover; background-position: center;
+            padding-top: 60px; align-items: center;
+        }
+
+        .ad-banner {
+            width: 90%; height: 45px; background: rgba(15, 23, 42, 0.9);
+            margin-bottom: 20px; border-radius: 12px; border: 1px solid rgba(251, 191, 36, 0.4);
+            display: flex; align-items: center; justify-content: center;
+            color: #fbbf24; font-size: 0.65rem; font-weight: 800; letter-spacing: 2px;
+        }
+
+        .stats-top { 
+            display: flex; justify-content: space-between; width: 85%; 
+            margin-bottom: 15px; color: #fff; font-size: 1rem; font-weight: 800;
+        }
+
+        /* PREMIUM GRID AREA */
+        .grid-outer {
+            padding: 12px; background: rgba(30, 41, 59, 0.5); 
+            border-radius: 24px; border: 2px solid rgba(251, 191, 36, 0.3);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); backdrop-filter: blur(20px);
+        }
+
+        .grid-container {
+            width: 300px; height: 300px; display: grid;
+            grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr);
+            gap: 12px;
         }
 
         .tile {
-            width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            display: flex;
-            align-items: center; justify-content: center;
-            font-size: 1.2rem; font-weight: 900;
-            transition: all 0.15s ease;
+            width: 100%; height: 100%; background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 900; transition: all 0.1s ease;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.02);
         }
 
-        /* Tile Colors based on value */
-        .tile-2 { background: #334155; color: #fff; }
-        .tile-4 { background: #475569; color: #fff; }
-        .tile-8 { background: #fbbf24; color: #000; box-shadow: 0 0 10px #fbbf24; }
-        .tile-16 { background: #f59e0b; color: #000; }
-        .tile-32 { background: #ea580c; color: #fff; }
-        .tile-64 { background: #dc2626; color: #fff; }
-        .tile-128 { background: #eab308; color: #000; font-size: 1rem; box-shadow: 0 0 15px #eab308; }
-        .tile-256 { background: #facc15; color: #000; font-size: 1rem; }
-        .tile-512 { background: #fbbf24; color: #000; }
-        .tile-1024 { background: #fff; color: #000; font-size: 0.8rem; }
-        .tile-2048 { background: #fbbf24; color: #000; box-shadow: 0 0 25px #fbbf24; animation: pulse 1s infinite; }
+        /* TILE PREMIUM COLORS */
+        .tile-2 { background: #e2e8f0; color: #1e293b; }
+        .tile-4 { background: #cbd5e1; color: #1e293b; }
+        .tile-8 { background: #fb923c; color: white; box-shadow: 0 0 15px rgba(251, 146, 60, 0.3); }
+        .tile-16 { background: #f97316; color: white; }
+        .tile-32 { background: #ea580c; color: white; }
+        .tile-64 { background: #dc2626; color: white; }
+        
+        /* MILESTONE TILES (GOLDEN LOOK) */
+        .tile-128 { background: #eab308; color: white; box-shadow: 0 0 20px #eab308; font-size: 1.3rem; }
+        .tile-256 { background: #facc15; color: #422006; box-shadow: 0 0 25px #facc15; border: 2px solid white; }
+        .tile-512 { background: #fbbf24; color: #422006; box-shadow: 0 0 30px #fbbf24; }
+        .tile-1024 { background: #f59e0b; color: white; box-shadow: 0 0 35px #f59e0b; font-size: 1.1rem; }
+        .tile-2048 { background: linear-gradient(45deg, #fbbf24, #fff, #fbbf24); color: #000; box-shadow: 0 0 45px #fbbf24; font-size: 1.1rem; }
 
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .controls-hint { margin-top: 25px; color: #64748b; font-size: 0.7rem; font-weight: 700; text-align: center; }
 
-        #endPopup { display: none; position: fixed; inset: 0; z-index: 1000; align-items: center; justify-content: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); }
+        /* MODAL */
+        .modal { position: fixed; inset: 0; background: rgba(2,6,23,0.96); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: #1e293b; width: 100%; max-width: 320px; border-radius: 30px; border: 2px solid #fbbf24; padding: 30px; text-align: center; }
+        .modal-btn { width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: 900; margin-top: 10px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <nav class="flex items-center justify-between mb-4">
-        <button onclick="window.location.href='jobs.html'" class="text-white text-xl"><i class="fas fa-chevron-left"></i></button>
-        <h1 class="text-lg font-black gold-text uppercase italic">2048 Wealth</h1>
-        <div class="w-8"></div>
-    </nav>
+    <div class="game-wrapper">
+        <div class="ad-banner">PREMIUM PARTNER AD</div>
 
-    <div class="flex justify-between items-center px-6 py-4 royal-card rounded-2xl mb-4">
-        <div>
-            <span class="text-[9px] text-gray-400 font-bold uppercase block">Current Value</span>
-            <div class="flex items-center gap-1.5">
-                <i class="fas fa-chart-line gold-text"></i>
-                <span id="score" class="text-2xl font-black">0</span>
-            </div>
+        <div class="stats-top">
+            <div>SCORE <br><span id="scoreText" style="color:#fbbf24">0</span></div>
+            <div style="text-align:right">EARNED <br><span id="rewardText" style="color:#fbbf24">🟡 0</span></div>
         </div>
-        <div class="text-right">
-            <span class="text-[9px] text-gray-400 font-bold uppercase block">Target</span>
-            <div class="text-xl font-black text-green-400">2048</div>
+
+        <div class="grid-outer">
+            <div class="grid-container" id="grid"></div>
         </div>
+
+        <div class="controls-hint">PC: USE ARROW KEYS<br>MOBILE: SWIPE TO MERGE</div>
     </div>
 
-    <div id="grid-container">
-        </div>
-
-    <p class="text-center text-[10px] text-gray-500 uppercase font-bold tracking-widest">Swipe to Merge & Multiply Wealth</p>
-
-    <div id="endPopup">
-        <div class="w-full max-w-xs royal-card p-8 rounded-[2.5rem] text-center">
-            <i class="fas fa-crown gold-text text-6xl mb-4"></i>
-            <h2 id="resultTitle" class="text-2xl font-black uppercase text-white">Target Reached!</h2>
-            <div class="my-6 bg-black/30 py-4 rounded-3xl border border-white/5">
-                <p class="text-4xl font-black gold-text">🟡 1,000</p>
-                <p class="text-[10px] text-gray-500 uppercase mt-1">Winning Reward</p>
+    <div class="modal" id="finishModal">
+        <div class="modal-content">
+            <div style="font-size: 3.5rem; margin-bottom: 10px;">🏆</div>
+            <h2 style="font-weight: 900; letter-spacing: 1px; color: #fff;">WORK COMPLETE</h2>
+            <p style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 20px;">Market strategies analyzed. Profits calculated.</p>
+            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 20px; margin-bottom: 25px;">
+                <span style="color: #94a3b8; font-size: 0.7rem;">TOTAL REWARD</span>
+                <div id="finalRewardText" style="font-size: 2.2rem; font-weight: 900; color: #fbbf24;">🟡 0</div>
             </div>
-            <div class="space-y-3">
-                <button onclick="location.reload()" class="w-full py-4 rounded-xl font-black uppercase text-sm bg-yellow-400 text-black">Try Again</button>
-                <button onclick="window.location.href='jobs.html'" class="w-full bg-white/5 text-white py-3 rounded-xl font-black uppercase text-xs border border-white/10">Back to Jobs</button>
-            </div>
+            <button class="modal-btn" style="background:#fbbf24; color:#020617;" onclick="location.href='jobs.html'">BACK TO JOBS</button>
+            <button class="modal-btn" style="background:transparent; color:#94a3b8; border:1px solid #334155; margin-top:15px;" onclick="location.href='dashboard.html'">DASHBOARD</button>
         </div>
     </div>
 
     <script src="settings.js"></script>
     <script>
-        const gridContainer = document.getElementById('grid-container');
-        const scoreDisplay = document.getElementById('score');
         let board = Array(16).fill(0);
         let score = 0;
+        let earned = 0;
+        let milestones = { 128: 50, 256: 100, 512: 200, 1024: 500, 2048: 1000 };
+        let reached = [];
 
-        function initGame() {
-            board = Array(16).fill(0);
-            addTile();
-            addTile();
-            drawBoard();
+        function init() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            for(let i=0; i<16; i++) {
+                let d = document.createElement('div');
+                d.id = `t-${i}`; d.className = 'tile';
+                grid.appendChild(d);
+            }
+            addTile(); addTile();
+            updateUI();
         }
 
         function addTile() {
-            let emptyTiles = board.map((val, idx) => val === 0 ? idx : null).filter(val => val !== null);
-            if (emptyTiles.length > 0) {
-                let randomIdx = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
-                board[randomIdx] = Math.random() < 0.9 ? 2 : 4;
-            }
+            let empty = board.map((v, i) => v === 0 ? i : null).filter(v => v !== null);
+            if(empty.length) board[empty[Math.floor(Math.random()*empty.length)]] = Math.random()>0.1?2:4;
         }
 
-        function drawBoard() {
-            gridContainer.innerHTML = '';
-            board.forEach(value => {
-                let tile = document.createElement('div');
-                tile.className = `tile ${value ? 'tile-' + value : ''}`;
-                tile.innerText = value ? value : '';
-                gridContainer.appendChild(tile);
+        function updateUI() {
+            board.forEach((val, i) => {
+                let t = document.getElementById(`t-${i}`);
+                t.innerText = val || '';
+                t.className = `tile ${val ? 'tile-'+val : ''}`;
+                if(milestones[val] && !reached.includes(val)) {
+                    reached.push(val); earned += milestones[val];
+                    document.getElementById('rewardText').innerText = `🟡 ${earned}`;
+                }
             });
-            scoreDisplay.innerText = score;
-            if (board.includes(2048)) endGame(true);
-        }
-
-        // --- Swipe Logic ---
-        let touchStartX, touchStartY;
-        document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY; });
-        document.addEventListener('touchend', e => {
-            let dx = e.changedTouches[0].clientX - touchStartX;
-            let dy = e.changedTouches[0].clientY - touchStartY;
-            if (Math.abs(dx) > Math.abs(dy)) {
-                if (dx > 30) move('right'); else if (dx < -30) move('left');
-            } else {
-                if (dy > 30) move('down'); else if (dy < -30) move('up');
-            }
-        });
-
-        function move(direction) {
-            let oldBoard = [...board];
-            if (direction === 'left') moveLeft();
-            if (direction === 'right') moveRight();
-            if (direction === 'up') moveUp();
-            if (direction === 'down') moveDown();
-
-            if (JSON.stringify(oldBoard) !== JSON.stringify(board)) {
-                addTile();
-                drawBoard();
-                checkGameOver();
-            }
+            document.getElementById('scoreText').innerText = score;
+            if (isGameOver()) setTimeout(finishGame, 1000);
         }
 
         function slide(row) {
-            let arr = row.filter(val => val);
-            for (let i = 0; i < arr.length - 1; i++) {
-                if (arr[i] === arr[i + 1]) {
-                    arr[i] *= 2;
-                    score += arr[i];
-                    arr.splice(i + 1, 1);
-                }
+            let arr = row.filter(v => v);
+            for(let i=0; i<arr.length-1; i++) {
+                if(arr[i] === arr[i+1]) { arr[i]*=2; score+=arr[i]; arr[i+1]=0; }
             }
-            while (arr.length < 4) arr.push(0);
+            arr = arr.filter(v => v);
+            while(arr.length < 4) arr.push(0);
             return arr;
         }
 
-        function moveLeft() {
-            for (let i = 0; i < 16; i += 4) {
-                let row = board.slice(i, i + 4);
-                board.splice(i, 4, ...slide(row));
+        function move(dir) {
+            let old = [...board];
+            for(let i=0; i<4; i++) {
+                let row = [];
+                if(dir==='L'||dir==='R') {
+                    for(let j=0; j<4; j++) row.push(board[i*4+j]);
+                    if(dir==='R') row.reverse();
+                    let nr = slide(row);
+                    if(dir==='R') nr.reverse();
+                    for(let j=0; j<4; j++) board[i*4+j] = nr[j];
+                } else {
+                    for(let j=0; j<4; j++) row.push(board[j*4+i]);
+                    if(dir==='D') row.reverse();
+                    let nr = slide(row);
+                    if(dir==='D') nr.reverse();
+                    for(let j=0; j<4; j++) board[j*4+i] = nr[j];
+                }
             }
+            if(old.join() !== board.join()) { addTile(); updateUI(); }
         }
 
-        function moveRight() {
-            for (let i = 0; i < 16; i += 4) {
-                let row = board.slice(i, i + 4).reverse();
-                board.splice(i, 4, ...slide(row).reverse());
+        // KEYBOARD CONTROLS FOR PC
+        window.addEventListener('keydown', e => {
+            if(e.key==='ArrowUp') move('U');
+            if(e.key==='ArrowDown') move('D');
+            if(e.key==='ArrowLeft') move('L');
+            if(e.key==='ArrowRight') move('R');
+        });
+
+        // TOUCH CONTROLS
+        let sx, sy;
+        document.addEventListener('touchstart', e => { sx=e.touches[0].clientX; sy=e.touches[0].clientY; });
+        document.addEventListener('touchend', e => {
+            let dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if(Math.abs(dx) > Math.abs(dy)) { if(Math.abs(dx)>30) move(dx>0?'R':'L'); }
+            else { if(Math.abs(dy)>30) move(dy>0?'D':'U'); }
+        });
+
+        function isGameOver() {
+            if(board.includes(0)) return false;
+            for(let i=0; i<4; i++) {
+                for(let j=0; j<4; j++) {
+                    if(j<3 && board[i*4+j] === board[i*4+j+1]) return false;
+                    if(i<3 && board[i*4+j] === board[(i+1)*4+j]) return false;
+                }
             }
+            return true;
         }
 
-        function moveUp() {
-            for (let i = 0; i < 4; i++) {
-                let col = [board[i], board[i+4], board[i+8], board[i+12]];
-                let newCol = slide(col);
-                for (let j = 0; j < 4; j++) board[i + j*4] = newCol[j];
-            }
+        function finishGame() {
+            let b = Number(localStorage.getItem('vv_balance')) || 0;
+            localStorage.setItem('vv_balance', b + earned);
+            document.getElementById('finalRewardText').innerText = "🟡 " + earned;
+            document.getElementById('finishModal').style.display = 'flex';
         }
 
-        function moveDown() {
-            for (let i = 0; i < 4; i++) {
-                let col = [board[i], board[i+4], board[i+8], board[i+12]].reverse();
-                let newCol = slide(col).reverse();
-                for (let j = 0; j < 4; j++) board[i + j*4] = newCol[j];
-            }
-        }
-
-        function checkGameOver() {
-            if (!board.includes(0)) {
-                // Simplified game over check
-                alert("No more moves!");
-            }
-        }
-
-        function endGame(win) {
-            if (win) {
-                let current = Number(localStorage.getItem('vv_coins')) || 0;
-                localStorage.setItem('vv_coins', current + 1000);
-                document.getElementById('endPopup').style.display = 'flex';
-            }
-        }
-
-        initGame();
+        init();
     </script>
 </body>
 </html>
