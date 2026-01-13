@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        body { background: transparent; color: white; font-family: 'Kanit', sans-serif; overflow-x: hidden; scrollbar-width: none; }
+        body::-webkit-scrollbar { display: none; }
+        .market-list { padding: 5px 15px; }
+        .asset-card { background: rgba(15, 23, 42, 0.7); border-radius: 18px; padding: 15px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .asset-info h4 { margin: 0; font-size: 0.85rem; color: #fbbf24; }
+        .asset-info span { font-size: 0.6rem; color: #94a3b8; }
+        .price-now { font-weight: 900; color: #fff; font-size: 0.9rem; }
+
+        #tradeModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); display: none; align-items: center; justify-content: center; z-index: 10001; padding: 20px; }
+        .trade-card { background: #0f172a; width: 100%; max-width: 380px; border-radius: 30px; padding: 20px; border: 1px solid #fbbf24; }
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 15px 0; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; border: 1px solid #1e293b; }
+        .detail-item span { display: block; font-size: 0.6rem; color: #64748b; }
+        .detail-item b { font-size: 0.8rem; color: #e2e8f0; }
+        .btn-buy { width: 100%; padding: 15px; border: none; border-radius: 15px; background: #fbbf24; color: #000; font-weight: 900; }
+    </style>
+</head>
+<body>
+
+<div class="market-list" id="estateList"></div>
+
+<div id="tradeModal">
+    <div class="trade-card">
+        <h2 id="tradeTitle" style="color:#fbbf24; text-align:center;">LOCATION</h2>
+        <div class="detail-grid" id="assetDetails"></div>
+        <div style="text-align:center; font-size:0.6rem; color:#64748b; margin-bottom:15px;">NOTE: 1% BROKERAGE ON MONTHLY RENT</div>
+        <button class="btn-buy" id="buyBtn" onclick="handleAction()">BUY PROPERTY</button>
+        <button onclick="closeTrade()" style="width:100%; background:none; border:none; color:#64748b; margin-top:15px;">CLOSE</button>
+    </div>
+</div>
+
+<script>
+    let selectedAsset = null; let estateData = []; let filterMode = 'all';
+    const locations = ["South Mumbai", "BKC", "Gurgaon Ph-1", "Delhi Civil Lines", "Noida Sec-15", "Bangalore Indiranagar", "Dubai Marina", "London Mayfair", "New York Manhattan", "Singapore Orchard"];
+
+    function init() {
+        let saved = localStorage.getItem('vv_market_estate');
+        if(saved) {
+            estateData = JSON.parse(saved);
+        } else {
+            for(let i=0; i<50; i++) {
+                let p = Math.floor(Math.random()*8000000+500000);
+                estateData.push({ id: 'e'+i, name: locations[i%locations.length] + " #" + (101+i), price: p, rent: Math.floor(p*0.006), owned: false });
+            }
+            localStorage.setItem('vv_market_estate', JSON.stringify(estateData));
+        }
+        render();
+    }
+
+    function render() {
+        const list = document.getElementById('estateList');
+        let displayList = [...estateData];
+        if(filterMode === 'owned') displayList = displayList.filter(a => a.owned);
+
+        list.innerHTML = '';
+        displayList.forEach(item => {
+            list.innerHTML += `
+                <div class="asset-card" onclick="openTrade('${item.id}')">
+                    <div class="asset-info"><h4>${item.name}</h4><span>${item.owned?'OWNED & RENTED':'AVAILABLE'}</span></div>
+                    <div class="price-now">${item.price.toLocaleString()}</div>
+                </div>`;
+        });
+    }
+
+    window.openTrade = (id) => {
+        selectedAsset = estateData.find(a => a.id === id);
+        document.getElementById('tradeTitle').innerText = selectedAsset.name;
+        document.getElementById('assetDetails').innerHTML = `<div class="detail-item"><span>Price</span><b>${selectedAsset.price.toLocaleString()}</b></div><div class="detail-item"><span>Monthly Rent</span><b>${selectedAsset.rent.toLocaleString()}</b></div><div class="detail-item"><span>Status</span><b>${selectedAsset.owned?'OWNED':'VACANT'}</b></div><div class="detail-item"><span>Brokerage</span><b>1%</b></div>`;
+        
+        let btn = document.getElementById('buyBtn');
+        if(selectedAsset.owned) { btn.innerText = "ALREADY OWNED"; btn.disabled = true; btn.style.opacity = 0.5; }
+        else { btn.innerText = "BUY PROPERTY"; btn.disabled = false; btn.style.opacity = 1; }
+        
+        document.getElementById('tradeModal').style.display = 'flex';
+    };
+
+    window.handleAction = () => {
+        if(parent.window.showVideoAd) parent.window.showVideoAd(() => executeBuy());
+        else executeBuy();
+    };
+
+    function executeBuy() {
+        let bal = Number(localStorage.getItem('vv_balance')) || 0;
+        let myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
+        if(bal >= selectedAsset.price) {
+            localStorage.setItem('vv_balance', bal - selectedAsset.price);
+            selectedAsset.owned = true;
+            myBiz.push({ id: selectedAsset.id, name: selectedAsset.name, count: 1, income: selectedAsset.rent });
+            localStorage.setItem('vv_biz', JSON.stringify(myBiz));
+            localStorage.setItem('vv_market_estate', JSON.stringify(estateData));
+            closeTrade(); render(); parent.postMessage('updateStats', '*');
+        } else alert("No Cash!");
+    }
+
+    window.closeTrade = () => { document.getElementById('tradeModal').style.display = 'none'; };
+    window.applyFilter = (m) => { filterMode = m; render(); };
+    init();
+</script>
+</body>
+</html>
