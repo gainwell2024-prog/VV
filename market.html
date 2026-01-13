@@ -11,18 +11,25 @@
         body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Kanit', sans-serif; }
         
         .market-wrapper { 
-            display: flex; flex-direction: column; height: 100vh; width: 100%; 
-            /* Header (70px) aur Footer (90px) ke liye space */
-            padding-top: 75px; padding-bottom: 95px;
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            width: 100%; 
+            padding-top: 75px; 
+            padding-bottom: 95px;
+            /* Background Fix: Ise business page se match kiya hai */
             background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.7), rgba(2, 6, 23, 0.9)), url('biz-bg.webp'); 
-            background-size: cover; position: relative; z-index: 1;
+            background-size: cover; 
+            background-position: center;
+            position: relative; 
+            z-index: 1;
         }
 
         .global-ad-banner { width: 92%; height: 50px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fbbf24; font-size: 0.7rem; font-weight: 800; margin: 0 auto 10px; letter-spacing: 2px; }
 
         .nav-section { width: 92%; margin: 0 auto 10px; }
         .tabs-container { display: flex; background: rgba(15, 23, 42, 0.9); padding: 4px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
-        .tab-btn { flex: 1; padding: 10px; border: none; background: none; color: #64748b; font-weight: 700; font-size: 0.75rem; border-radius: 8px; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: none; color: #64748b; font-weight: 700; font-size: 0.75rem; border-radius: 8px; cursor: pointer; }
         .tab-btn.active { background: #fbbf24; color: #020617; }
 
         .market-stats-box { width: 92%; background: rgba(15, 23, 42, 0.95); border: 1px solid #fbbf24; border-radius: 15px; margin: 0 auto 12px; padding: 15px; display: flex; justify-content: space-around; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
@@ -33,7 +40,13 @@
         .tools-row { width: 92%; margin: 0 auto 10px; display: flex; justify-content: flex-end; }
         .sort-select { background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(251, 191, 36, 0.4); color: #fbbf24; padding: 6px 12px; border-radius: 8px; font-size: 0.65rem; font-family: 'Kanit'; }
 
-        #marketFrame { flex: 1; border: none; width: 100%; background: transparent; }
+        /* Iframe Transparency Fix */
+        #marketFrame { 
+            flex: 1; 
+            border: none; 
+            width: 100%; 
+            background: transparent !important;
+        }
     </style>
 </head>
 <body>
@@ -65,7 +78,7 @@
             <select class="sort-select" id="sortOption" onchange="applySort()"></select>
         </div>
 
-        <iframe id="marketFrame" src="market_stocks.html"></iframe>
+        <iframe id="marketFrame" src="market_stocks.html" allowtransparency="true" style="background:transparent;"></iframe>
     </div>
 
     <script>
@@ -88,18 +101,28 @@
             const port = JSON.parse(localStorage.getItem('vv_portfolio')) || {};
             let count = Object.keys(port).filter(k => port[k].qty > 0).length;
             document.getElementById('portVal').innerText = count > 0 ? count + " ASSETS" : "EMPTY";
-            document.getElementById('sortOption').innerHTML = configs[currentTab];
+            
+            // Only update dropdown if it's empty
+            if(!document.getElementById('sortOption').innerHTML) {
+                document.getElementById('sortOption').innerHTML = configs[currentTab];
+            }
         }
 
         function loadTab(tab, btn) {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            
+            // Frame change
             document.getElementById('marketFrame').src = `market_${tab}.html`;
-            updateUI();
+            
+            // Dropdown change
+            document.getElementById('sortOption').innerHTML = configs[tab];
+            
             filterMode = 'all';
             document.getElementById('portLbl').innerText = "PORTFOLIO";
             document.getElementById('portLbl').style.color = "#94a3b8";
+            updateUI();
         }
 
         function togglePortfolio() {
@@ -114,7 +137,10 @@
             document.getElementById('marketFrame').contentWindow.postMessage({ type: 'sort', value: val }, '*');
         }
 
-        window.addEventListener('message', (e) => { if(e.data === 'updateStats') updateUI(); });
+        window.addEventListener('message', (e) => { 
+            if(e.data === 'updateStats') updateUI(); 
+        });
+
         setInterval(updateUI, 2000);
         updateUI();
     </script>
