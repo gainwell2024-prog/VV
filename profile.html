@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Investor Profile | Virtual Ventures</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Inter', sans-serif; }
+        body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Kanit', sans-serif; }
 
         .profile-container {
             display: flex; flex-direction: column; height: 100vh; width: 100%;
@@ -26,7 +27,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* LIGHT GLASS BACKGROUND (Matched with Dashboard Header Box) */
         .glass-box { 
             background: rgba(15, 23, 42, 0.85); 
             border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.2);
@@ -36,7 +36,6 @@
             overflow: hidden;
         }
 
-        /* IDENTITY */
         .identity-card { display: flex; align-items: center; padding: 15px 20px; }
         .avatar-circle { width: 65px; height: 65px; background: #fbbf24; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; }
         .user-info { flex: 1; text-align: center; } 
@@ -56,14 +55,12 @@
         .confirm-btn { width: 100%; padding: 16px; background: #fbbf24; color: #020617; border: none; border-radius: 15px; font-weight: 900; font-size: 0.9rem; margin-top: 10px; letter-spacing: 1px; }
         .reset-btn { width: 100%; padding: 12px; background: transparent; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 12px; font-weight: 700; font-size: 0.7rem; margin-top: 20px; margin-bottom: 40px; }
 
-        /* LOCK TIMER STYLE */
         .lock-timer-box { 
             text-align: center; color: #fbbf24; font-size: 0.7rem; font-weight: 800; 
             background: rgba(251, 191, 36, 0.05); padding: 15px; border-radius: 15px; 
             border: 1px dashed rgba(251, 191, 36, 0.4); margin-top: 10px;
         }
 
-        /* POPUP MODAL */
         #confirmModal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
         .id-card { background: linear-gradient(145deg, #1e293b, #0f172a); width: 100%; max-width: 350px; border-radius: 35px; border: 2px solid #fbbf24; overflow: hidden; text-align: center; }
         
@@ -106,10 +103,10 @@
 
             <p class="section-title">Financial Report</p>
             <div class="glass-box">
-                <div class="list-item"><span class="label-main">Net Worth</span><span class="rep-val" id="repNW">0</span></div>
-                <div class="list-item"><span class="label-main">Real Estate</span><span class="rep-val">0</span></div>
-                <div class="list-item"><span class="label-main">Stock Portfolio</span><span class="rep-val">0</span></div>
-                <div class="list-item"><span class="label-main">Crypto Wallet</span><span class="rep-val">0</span></div>
+                <div class="list-item"><span class="label-main">Total Assets (Net Worth)</span><span class="rep-val" id="totalAssets">0</span></div>
+                <div class="list-item"><span class="label-main">Bank Balance</span><span class="rep-val" id="bankBalance">0</span></div>
+                <div class="list-item"><span class="label-main">Stock Holdings Value</span><span class="rep-val" id="stockValue">0</span></div>
+                <div class="list-item"><span class="label-main">Estate Value</span><span class="rep-val" id="estateValue">0</span></div>
             </div>
 
             <button class="reset-btn" onclick="resetGame()">RESET PROGRESS</button>
@@ -134,11 +131,36 @@
 
     <script src="settings.js"></script>
     <script>
-        const diets = [{n:"Vada Pav & Chai", c:10}, {n:"Home Cooked Thali", c:40}, {n:"Fast Food & Drinks", c:150}, {n:"Gourmet Dining", c:500}, {n:"Private Chef Service", c:2000}];
-        const livings = [{n:"Shared Dormitory", c:20}, {n:"Co-Living Studio", c:150}, {n:"City Center Flat", c:800}, {n:"Luxury Penthouse", c:3500}, {n:"Private Mega Mansion", c:15000}];
-        const transports = [{n:"Walking", c:0}, {n:"Public Transport", c:10}];
+        const diets = [
+            {n:"Vada Pav & Chai", c:10},
+            {n:"Home Cooked Thali", c:40},
+            {n:"Fast Food & Drinks", c:150},
+            {n:"Gourmet Dining", c:500},
+            {n:"Private Chef Service", c:2000}
+        ];
 
-        const energyMatrix = [[500,550,600,650,700],[600,750,800,850,900],[700,850,1000,1100,1150],[800,950,1150,1300,1400],[900,1050,1250,1400,1500]];
+        const livings = [
+            {n:"Shared Dormitory", c:20},
+            {n:"Co-Living Studio", c:150},
+            {n:"City Center Flat", c:800},
+            {n:"Luxury Penthouse", c:3500},
+            {n:"Private Mega Mansion", c:15000}
+        ];
+
+        const transports = [
+            {n:"Scooty", c:50, level:1},
+            {n:"Car", c:200, level:2},
+            {n:"Luxury Car", c:500, level:3},
+            {n:"Private Jet", c:2000, level:4}
+        ];
+
+        const energyMatrix = [
+            [500,550,600,650,700],
+            [600,750,800,850,900],
+            [700,850,1000,1100,1150],
+            [800,950,1150,1300,1400],
+            [900,1050,1250,1400,1500]
+        ];
 
         function init() {
             const dSel = document.getElementById('dietSelect');
@@ -147,17 +169,31 @@
 
             diets.forEach(x => dSel.innerHTML += `<option value="${x.c}">${x.n}</option>`);
             livings.forEach(x => lSel.innerHTML += `<option value="${x.c}">${x.n}</option>`);
-            transports.forEach(x => tSel.innerHTML += `<option value="${x.c}">${x.n}</option>`);
+
+            let currentTransCost = Number(localStorage.getItem('vv_trans_cost')) || 0;
+
+            if (currentTransCost === 0) {
+                tSel.innerHTML = `<option value="0" selected>Walking (Default)</option>`;
+            } else {
+                const matched = transports.find(t => t.c === currentTransCost);
+                if (matched) {
+                    transports.forEach(x => {
+                        tSel.innerHTML += `<option value="${x.c}" ${x.c === currentTransCost ? 'selected' : ''}>${x.n}</option>`;
+                    });
+                } else {
+                    tSel.innerHTML = `<option value="${currentTransCost}" selected>Premium Transport (Locked)</option>`;
+                }
+            }
 
             dSel.value = localStorage.getItem('vv_diet_cost') || 10;
             lSel.value = localStorage.getItem('vv_live_cost') || 20;
-            tSel.value = localStorage.getItem('vv_trans_cost') || 0;
+            tSel.value = currentTransCost;
 
             document.getElementById('userNameDisplay').innerText = (localStorage.getItem('vv_name') || "INVESTOR").toUpperCase();
             document.getElementById('userAvatar').innerText = localStorage.getItem('vv_avatar') || "👤";
-            document.getElementById('repNW').innerText = Math.floor(localStorage.getItem('vv_balance') || 0).toLocaleString();
 
             syncCosts();
+            updateFinancials(); // Initial financial update
             checkLocks();
         }
 
@@ -165,6 +201,7 @@
             const d = parseInt(document.getElementById('dietSelect').value);
             const l = parseInt(document.getElementById('liveSelect').value);
             const t = parseInt(document.getElementById('transSelect').value);
+
             document.getElementById('costDiet').innerText = `${d}/hr`;
             document.getElementById('costLive').innerText = `${l}/hr`;
             document.getElementById('costTrans').innerText = `${t}/hr`;
@@ -174,6 +211,7 @@
             const d = parseInt(document.getElementById('dietSelect').value);
             const l = parseInt(document.getElementById('liveSelect').value);
             const t = parseInt(document.getElementById('transSelect').value);
+
             const dIdx = diets.findIndex(x => x.c === d);
             const lIdx = livings.findIndex(x => x.c === l);
             const energy = energyMatrix[dIdx][lIdx];
@@ -184,12 +222,15 @@
             document.getElementById('confirmModal').style.display = 'flex';
         }
 
-        function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; }
+        function closeConfirm() { 
+            document.getElementById('confirmModal').style.display = 'none'; 
+        }
 
         function applyChanges() {
             const d = parseInt(document.getElementById('dietSelect').value);
             const l = parseInt(document.getElementById('liveSelect').value);
             const t = parseInt(document.getElementById('transSelect').value);
+
             const dIdx = diets.findIndex(x => x.c === d);
             const lIdx = livings.findIndex(x => x.c === l);
             const energy = energyMatrix[dIdx][lIdx];
@@ -197,13 +238,17 @@
             localStorage.setItem('vv_diet_cost', d);
             localStorage.setItem('vv_live_cost', l);
             localStorage.setItem('vv_trans_cost', t);
-            localStorage.setItem('vv_diet_name', diets[dIdx].n); // For dashboard refill speed
             localStorage.setItem('vv_hourly_exp', (d + l + t));
             localStorage.setItem('vv_max_energy', energy);
             localStorage.setItem('vv_profile_lock', Date.now());
 
+            const matchedDiet = diets.find(x => x.c === d);
+            if (matchedDiet) localStorage.setItem('vv_diet_name', matchedDiet.n);
+
             closeConfirm();
             checkLocks();
+            alert("Lifestyle updated! Locked for 1 hour.");
+            updateFinancials(); // Refresh financials after change
         }
 
         function checkLocks() {
@@ -225,7 +270,63 @@
             actionArea.innerHTML = `<button id="saveBtn" class="confirm-btn" onclick="openConfirm()">CONFIRM & LOCK LIFESTYLE</button>`;
         }
 
-        function resetGame() { if(confirm("DANGER: This will delete everything!")) { localStorage.clear(); window.location.href='index.html'; } }
+        // NEW: Calculate and Update Financial Report
+        function updateFinancials() {
+            const port = JSON.parse(localStorage.getItem('vv_portfolio')) || {};
+            const myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
+            const marketData = JSON.parse(localStorage.getItem('vv_master_market')) || { stocks: [], estate: [] };
+
+            // Bank Balance (dashboard balance)
+            const bankBalance = Number(localStorage.getItem('vv_balance')) || 0;
+
+            // Business Value (total invested in businesses + upgrades)
+            let businessValue = 0;
+            myBiz.forEach(biz => {
+                businessValue += (biz.totalInvested || 0);
+            });
+
+            // Stock Holdings Value (current price * qty)
+            let stockValue = 0;
+            Object.keys(port).forEach(key => {
+                if (key.startsWith('stk_')) {
+                    const asset = marketData.stocks.find(a => a.id === key);
+                    if (asset && port[key].qty > 0) {
+                        stockValue += port[key].qty * asset.price;
+                    }
+                }
+            });
+
+            // Estate Value (current price * qty)
+            let estateValue = 0;
+            Object.keys(port).forEach(key => {
+                if (key.startsWith('e')) {
+                    const asset = marketData.estate.find(a => a.id === key);
+                    if (asset && port[key].qty > 0) {
+                        estateValue += port[key].qty * asset.price;
+                    }
+                }
+            });
+
+            // Total Assets (Net Worth)
+            const totalAssets = bankBalance + businessValue + stockValue + estateValue;
+
+            // Update UI
+            document.getElementById('totalAssets').innerText = window.formatBalance(totalAssets);
+            document.getElementById('bankBalance').innerText = window.formatBalance(bankBalance);
+            document.getElementById('stockValue').innerText = window.formatBalance(stockValue);
+            document.getElementById('estateValue').innerText = window.formatBalance(estateValue);
+        }
+
+        // Run financials update every 5 seconds (live with market changes)
+        setInterval(updateFinancials, 5000);
+        updateFinancials(); // Initial
+
+        function resetGame() { 
+            if(confirm("DANGER: This will delete everything!")) { 
+                localStorage.clear(); 
+                window.location.href='index.html'; 
+            } 
+        }
 
         window.onload = init;
     </script>

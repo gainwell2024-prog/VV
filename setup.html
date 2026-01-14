@@ -134,7 +134,7 @@
         let avIdx = 0;
         let stats = { diet: 10, live: 20, avatar: '👦' };
 
-        // Energy Table Logic
+        // Energy Table Logic (max energy calculation)
         const dietMap = { 10: 0, 40: 1, 150: 2, 500: 3, 2000: 4 };
         const liveMap = { 20: 0, 150: 1, 800: 2, 3500: 3, 15000: 4 };
         const energyMatrix = [
@@ -180,35 +180,42 @@
             document.getElementById('confirmModal').style.display = 'flex';
         }
 
-        function closeModal() { document.getElementById('confirmModal').style.display = 'none'; }
+        function closeModal() { 
+            document.getElementById('confirmModal').style.display = 'none'; 
+        }
 
         function finalSave() {
             let name = document.getElementById('pName').value.trim();
-            const energy = energyMatrix[dietMap[stats.diet]][liveMap[stats.live]];
-            const checksum = btoa(500 + "VV_BOSS_786" + name); //
+            if (!name) return; // extra safety
 
+            const energyCap = energyMatrix[dietMap[stats.diet]][liveMap[stats.live]];
+
+            // Save separate costs for future refill calculation
             localStorage.setItem('vv_name', name);
             localStorage.setItem('vv_avatar', stats.avatar);
-            localStorage.setItem('vv_hourly_exp', (stats.diet + stats.live));
+            localStorage.setItem('vv_diet_cost', stats.diet);       // ← NEW: separate diet
+            localStorage.setItem('vv_live_cost', stats.live);       // ← NEW: separate living
+            localStorage.setItem('vv_trans_cost', 0);               // ← NEW: default Walk (0)
+            localStorage.setItem('vv_trans_level', 0);              // ← NEW: level 0 = Walk
+            localStorage.setItem('vv_hourly_exp', stats.diet + stats.live + 0); // total for now
+
             localStorage.setItem('vv_balance', 500);
-            localStorage.setItem('vv_max_energy', energy);
-            localStorage.setItem('vv_energy', energy);
+            localStorage.setItem('vv_max_energy', energyCap);
+            localStorage.setItem('vv_energy', energyCap);
             localStorage.setItem('vv_last_check', Date.now());
-            localStorage.setItem('vv_checksum', checksum);
+            localStorage.setItem('vv_last_energy_check', Date.now()); // energy sync ke liye
+            localStorage.setItem('vv_checksum', btoa(500 + "VV_BOSS_786" + name));
+
+            // Settings defaults
+            localStorage.setItem('vv_music', 'on');
+            localStorage.setItem('vv_sound', 'on');
             localStorage.setItem('vv_setup_done', 'true');
 
             window.location.href = 'dashboard.html';
-function finalSave() {
-    // ... tera purana saving logic ...
-
-    // Add these for Settings & Sound
-    localStorage.setItem('vv_music', 'on');
-    localStorage.setItem('vv_sound', 'on');
-    localStorage.setItem('vv_setup_done', 'true');
-
-    window.location.href = 'dashboard.html';
-}
         }
+
+        // Initial call to show default stats
+        updateLiveStats();
     </script>
 </body>
 </html>

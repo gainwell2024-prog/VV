@@ -10,44 +10,38 @@
 
         .dashboard-container {
             display: flex; flex-direction: column; height: 100vh; width: 100%;
-            /* BACKGROUND IMAGE */
             background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 0.7)), url('dashboard-bg.png');
             background-size: cover; background-position: center;
         }
 
-        /* 1. AD BANNER (Adjusted Niche) */
         .global-ad-banner {
             width: 92%; height: 45px; background: rgba(15, 23, 42, 0.9); 
             border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             color: #fbbf24; font-size: 0.6rem; font-weight: 800; 
-            margin: 65px auto 10px auto; /* Branding ke niche aur gap */
+            margin: 65px auto 10px auto;
             backdrop-filter: blur(10px); z-index: 100;
         }
 
-        /* 2. NETWORTH BOX (Background added) */
         .header-box { 
             width: 92%; margin: 0 auto; padding: 15px; text-align: center;
-            background: rgba(15, 23, 42, 0.85); /* Solid background for clarity */
+            background: rgba(15, 23, 42, 0.85);
             border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.2);
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
         .nw-label { font-size: 0.6rem; color: #94a3b8; font-weight: 700; letter-spacing: 3px; margin-bottom: 2px; }
         .nw-value { font-size: 2.8rem; font-weight: 900; color: #fbbf24; text-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
 
-        /* 3. GAME AREA */
         .game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
         #mainCoinBtn { font-size: 8rem; cursor: pointer; transition: 0.1s; user-select: none; }
         #mainCoinBtn:active { transform: scale(0.9); }
 
-        /* ENERGY BAR */
         .energy-wrap { width: 85%; margin-top: 20px; }
         .energy-bar-bg { width: 100%; height: 12px; background: rgba(0,0,0,0.6); border-radius: 30px; border: 1px solid rgba(251, 191, 36, 0.4); overflow: hidden; }
-        .energy-fill { height: 100%; background: linear-gradient(90deg, #d97706, #fbbf24); width: 100%; transition: 0.3s ease; }
+        .energy-fill { height: 100%; background: linear-gradient(90deg, #d97706, #fbbf24); width: 100%; transition: width 0.1s linear; } /* Smooth transition */
         .energy-stats { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; font-weight: 900; color: #fbbf24; }
 
-        /* 4. HUSTLE SECTION (Msg + Button) */
         .hustle-section { padding-bottom: 110px; text-align: center; }
         .hustle-msg { font-size: 0.65rem; color: #94a3b8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         .side-hustle-btn {
@@ -86,15 +80,12 @@
 
     <script src="settings.js"></script>
     <script>
+    let lastFrameTime = performance.now();
+    let displayedEnergy = Number(localStorage.getItem('vv_energy')) || 0; // Smooth display value
+    let lastRealEnergy = displayedEnergy; // To detect jumps
+
     function getMaxEnergy() {
         return Number(localStorage.getItem('vv_max_energy')) || 500;
-    }
-
-    // Refill Rate half values for dashboard display
-    function getRefillRate() {
-        const dietCost = Number(localStorage.getItem('vv_diet_cost')) || 10;
-        const rates = { 10: 0.15, 40: 0.3, 150: 0.5, 500: 0.75, 2000: 1.25 };
-        return rates[dietCost] || 0.15;
     }
 
     function formatBalance(num) {
@@ -103,47 +94,75 @@
         return Math.floor(num).toLocaleString();
     }
 
-    function updateUI() {
-    let coins = Number(localStorage.getItem('vv_balance')) || 0;
-    let currentEnergy = Number(localStorage.getItem('vv_energy')) || 0;
-    const maxE = getMaxEnergy();
+    function smoothUpdateEnergy() {
+        const now = performance.now();
+        const deltaTime = (now - lastFrameTime) / 1000; // seconds
+        lastFrameTime = now;
 
-    if (currentEnergy < maxE) {
-        currentEnergy = Math.min(maxE, currentEnergy + (getRefillRate() * 0.5));
-        localStorage.setItem('vv_energy', currentEnergy);
+        const realEnergy = Number(localStorage.getItem('vv_energy')) || 0;
+        const maxE = getMaxEnergy();
+
+        // Smoothly move displayedEnergy towards realEnergy
+        const speed = 8; // Adjust this: higher = faster catch-up (8 is smooth & responsive)
+        displayedEnergy += (realEnergy - displayedEnergy) * speed * deltaTime;
+
+        // Clamp to valid range
+        displayedEnergy = Math.max(0, Math.min(maxE, displayedEnergy));
+
+        // Update bar & text
+        document.getElementById('energyFill').style.width = (displayedEnergy / maxE) * 100 + "%";
+        document.getElementById('energyText').innerText = `${Math.floor(displayedEnergy)} / ${maxE}`;
+
+        requestAnimationFrame(smoothUpdateEnergy);
     }
 
-    // Naya global formatter use ho raha hai
-    document.getElementById('coinCountDisplay').innerText = window.formatBalance(coins);
-    document.getElementById('energyFill').style.width = (currentEnergy / maxE) * 100 + "%";
-    document.getElementById('energyText').innerText = `${Math.floor(currentEnergy)} / ${maxE}`;
-}
+    function updateUI() {
+        let coins = Number(localStorage.getItem('vv_balance')) || 0;
+        document.getElementById('coinCountDisplay').innerText = window.formatBalance(coins);
+        // Energy ko smooth handle kar raha hai, isliye yahan update nahi
+    }
 
     function handleTap(e) {
         let energy = Number(localStorage.getItem('vv_energy')) || 0;
         if (energy < 1) return;
-        
-        if(window.navigator.vibrate) window.navigator.vibrate(10);
-        
+
+        if (window.navigator.vibrate) window.navigator.vibrate(10);
+
         localStorage.setItem('vv_balance', (Number(localStorage.getItem('vv_balance')) || 0) + 1);
         localStorage.setItem('vv_energy', energy - 1);
-        
-        // Instant update on tap
-        updateUI();
 
-        const f = document.createElement('div'); f.className = 'tap-anim'; f.innerText = '+1';
+        // Sound
+        if (window.playSound) window.playSound('tap');
+
+        // +1 animation
+        const f = document.createElement('div');
+        f.className = 'tap-anim';
+        f.innerText = '+1';
         const x = e.touches ? e.touches[0].clientX : e.clientX;
         const y = e.touches ? e.touches[0].clientY : e.clientY;
-        f.style.left = (x - 20) + 'px'; f.style.top = (y - 40) + 'px';
-        document.body.appendChild(f); setTimeout(() => f.remove(), 600);
+        f.style.left = (x - 20) + 'px';
+        f.style.top = (y - 40) + 'px';
+        document.body.appendChild(f);
+        setTimeout(() => f.remove(), 600);
+
+        // Instant coin update
+        updateUI();
     }
 
     const btn = document.getElementById('mainCoinBtn');
     btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleTap(e); });
     btn.addEventListener('mousedown', (e) => { handleTap(e); });
 
-    setInterval(updateUI, 1000); 
+    // Start smooth animation loop
+    requestAnimationFrame(smoothUpdateEnergy);
+
+    // Periodic full sync (coins + safety)
+    setInterval(() => {
+        updateUI();
+    }, 1000);
+
+    // Initial update
     updateUI();
-</script>
+    </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-// 1. UNIVERSAL STYLES
+// 1. UNIVERSAL STYLES (same as before)
 const universalStyles = `
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap');
@@ -27,7 +27,7 @@ const universalStyles = `
 
 document.head.insertAdjacentHTML('beforeend', universalStyles);
 
-// 2. UNIVERSAL NUMBER FORMATTER (No symbols, NaN protection)
+// 2. UNIVERSAL NUMBER FORMATTER (unchanged)
 window.formatBalance = function(num) {
     if (num === null || num === undefined || isNaN(num)) return "0";
     let negative = num < 0;
@@ -46,7 +46,7 @@ window.formatBalance = function(num) {
     return (negative ? "-" : "") + formatted;
 };
 
-// 3. AUDIO & UI INJECTION
+// 3. AUDIO & UI INJECTION (footer updated here)
 const audio = { bg: new Audio('bg-music.mp3'), tap: new Audio('tap.mp3') };
 audio.bg.loop = true;
 
@@ -65,8 +65,8 @@ function injectUI() {
             <i class="fas fa-briefcase"></i><span>EMPIRE</span></a>
         <a href="market.html" class="nav-item ${window.location.href.includes('market')?'active':''}">
             <i class="fas fa-chart-line"></i><span>INVEST</span></a>
-        <a href="jobs.html" class="nav-item ${window.location.href.includes('jobs')?'active':''}">
-            <i class="fas fa-bolt"></i><span>HUSTLE</span></a>
+        <a href="#" class="nav-item" onclick="alert('Events Coming Soon! 🔥'); return false;">
+            <i class="fas fa-calendar-alt"></i><span>EVENT</span></a>
         <a href="profile.html" class="nav-item ${window.location.href.includes('profile')?'active':''}">
             <i class="fas fa-user-circle"></i><span>PROFILE</span></a>
     </div>`;
@@ -97,13 +97,12 @@ function renderSettings() {
 }
 injectUI();
 
-// 4. FINANCE ENGINE (Calculation Fix)
+// 4. FINANCE ENGINE (unchanged)
 function processFinances() {
     const lastCheck = localStorage.getItem('vv_last_finance_check');
     const now = Date.now();
     
     const myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
-    // Important: Biz income match from logic
     const hourlyIncome = myBiz.reduce((total, biz) => {
         const income = biz.income || 0;
         const levelBonus = biz.count > 1 ? (income * 0.25 * (biz.count - 1)) : 0;
@@ -150,7 +149,7 @@ function showFinancePopup(amount, seconds) {
     document.body.insertAdjacentHTML('beforeend', popupHtml);
 }
 
-// 5. ENERGY ENGINE
+// 5. ENERGY ENGINE (unchanged)
 function syncEnergy() {
     const lastCheck = localStorage.getItem('vv_last_energy_check');
     const now = Date.now();
@@ -168,7 +167,7 @@ function syncEnergy() {
     localStorage.setItem('vv_last_energy_check', now);
 }
 
-// 6. INFLATION ENGINE
+// 6. INFLATION ENGINE (unchanged)
 function applyInflation() {
     const lastUpdate = localStorage.getItem('vv_last_inflation_date');
     const now = Date.now();
@@ -186,7 +185,7 @@ function applyInflation() {
 }
 window.getInflationRate = () => Number(localStorage.getItem('vv_inflation_rate')) || 1.15;
 
-// 7. EXECUTION (The 2-second Delay fix)
+// 7. EXECUTION
 setTimeout(() => {
     processFinances(); 
     syncEnergy();
@@ -194,5 +193,5 @@ setTimeout(() => {
     setInterval(() => { 
         processFinances(); 
         syncEnergy(); 
-    }, 60000); // Background sync every 1 minute
+    }, 60000);
 }, 2000);

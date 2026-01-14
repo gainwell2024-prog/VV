@@ -11,11 +11,18 @@
         .biz-wrapper { display: flex; flex-direction: column; height: 100vh; width: 100%; padding-top: 70px; padding-bottom: 20px; background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.6), rgba(2, 6, 23, 0.9)), url('biz-bg.webp'); background-size: cover; }
         .global-ad-banner { width: 92%; height: 50px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fbbf24; font-size: 0.7rem; font-weight: 800; margin: 0 auto 5px; letter-spacing: 2px; }
         
-        /* NEW STATUS BOX */
         .biz-stats-box { width: 92%; background: rgba(15, 23, 42, 0.95); border: 1px solid #fbbf24; border-radius: 15px; margin: 0 auto 15px; padding: 12px; display: flex; justify-content: space-around; align-items: center; text-align: center; }
         .stat-item { flex: 1; }
         .stat-val { display: block; font-weight: 900; font-size: 1.1rem; color: #fbbf24; }
         .stat-lbl { font-size: 0.6rem; color: #94a3b8; letter-spacing: 1px; }
+
+        /* Flash animation for coins update */
+        @keyframes coinFlash {
+            0% { color: #fbbf24; transform: scale(1); }
+            50% { color: #4ade80; transform: scale(1.15); }
+            100% { color: #fbbf24; transform: scale(1); }
+        }
+        .coin-update { animation: coinFlash 0.6s ease; }
 
         .biz-list { flex: 1; overflow-y: auto; padding: 0 15px; scrollbar-width: none; }
         .biz-card { background: rgba(15, 23, 42, 0.7); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); padding: 15px; margin-bottom: 12px; }
@@ -54,12 +61,12 @@
         
         <div class="biz-stats-box">
             <div class="stat-item">
-                <span id="topCoins" class="stat-val"> 0</span>
+                <span id="topCoins" class="stat-val">0</span>
                 <span class="stat-lbl">CASH BALANCE</span>
             </div>
             <div style="width: 1px; height: 30px; background: rgba(251,191,36,0.3);"></div>
             <div class="stat-item">
-                <span id="topIncome" class="stat-val"> 0/hr</span>
+                <span id="topIncome" class="stat-val">0/hr</span>
                 <span class="stat-lbl">INCOME FROM BUSINESS</span>
             </div>
         </div>
@@ -86,30 +93,65 @@
             income: Math.floor(45 * Math.pow(1.5, i))
         }));
 
-        function render() {
-    const container = document.getElementById('bizContainer');
-    const myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
-    const coins = Number(localStorage.getItem('vv_balance')) || 0;
-    let html = '';
-    let totalIncome = 0;
-
-    // FIX: Total Income calculation ko sahi kiya
-    myBiz.forEach(m => {
-        const originalBiz = businesses.find(b => b.id === m.id);
-        if (originalBiz) {
-            // Level 1 par base income, higher levels par 25% extra per level
-            const bizIncome = m.count > 0 ? originalBiz.income + (originalBiz.income * 0.25 * (m.count - 1)) : 0;
-            totalIncome += bizIncome;
+        // Live coins update with flash
+        function updateCoinsLive() {
+            const coins = Number(localStorage.getItem('vv_balance')) || 0;
+            const elem = document.getElementById('topCoins');
+            const oldText = elem.innerText;
+            elem.innerText = window.formatBalance(coins);
+            
+            if (oldText !== elem.innerText) {
+                elem.classList.add('coin-update');
+                setTimeout(() => elem.classList.remove('coin-update'), 600);
+            }
         }
-    });
 
-    // UI Update (Coin symbol remove kar diya aapke kahe mutabiq)
-    document.getElementById('topCoins').innerText = `${window.formatBalance(coins)}`;
-    document.getElementById('topIncome').innerText = `${window.formatBalance(totalIncome)}/hr`;
+        function render() {
+            const container = document.getElementById('bizContainer');
+            const myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
+            const coins = Number(localStorage.getItem('vv_balance')) || 0;
+            let html = '';
+            let totalIncome = 0;
 
-    // ... baaki businesses.forEach wala code same rahega ...
+            // Calculate total income
+            myBiz.forEach(m => {
+                const originalBiz = businesses.find(b => b.id === m.id);
+                if (originalBiz) {
+                    const bizIncome = m.count > 0 ? originalBiz.income + (originalBiz.income * 0.25 * (m.count - 1)) : 0;
+                    totalIncome += bizIncome;
+                }
+            });
 
-            businesses.forEach(b => {
+            document.getElementById('topCoins').innerText = window.formatBalance(coins);
+            document.getElementById('topIncome').innerText = `${window.formatBalance(totalIncome)}/hr`;
+
+            // Sort businesses: Owned first (higher level priority), then affordable, then rest by cost
+            const sortedBiz = [...businesses].sort((a, b) => {
+                const ownedA = myBiz.find(m => m.id === a.id);
+                const ownedB = myBiz.find(m => m.id === b.id);
+                
+                const levelA = ownedA ? ownedA.count : 0;
+                const levelB = ownedB ? ownedB.count : 0;
+                
+                // Owned businesses first (higher level pehle)
+                if (levelA > 0 || levelB > 0) {
+                    if (levelA > 0 && levelB === 0) return -1;
+                    if (levelB > 0 && levelA === 0) return 1;
+                    if (levelA !== levelB) return levelB - levelA; // higher level first
+                }
+                
+                // Affordable pehle
+                const priceA = Math.floor(a.cost * window.getInflationRate() * Math.pow(2.1, levelA));
+                const priceB = Math.floor(b.cost * window.getInflationRate() * Math.pow(2.1, levelB));
+                
+                if (coins >= priceA && coins < priceB) return -1;
+                if (coins >= priceB && coins < priceA) return 1;
+                
+                // Baaki cost ascending
+                return priceA - priceB;
+            });
+
+            sortedBiz.forEach(b => {
                 const owned = myBiz.find(m => m.id === b.id);
                 const lvl = owned ? owned.count : 0;
                 const inflation = window.getInflationRate(); 
@@ -131,13 +173,16 @@
                     </div>
                     <div class="btn-row">
                         <button class="btn-buy" onclick="handleAction(${b.id}, ${price}, ${lvl})" ${coins < price || lvl >= 10 ? 'disabled' : ''}>
-                            ${lvl === 0 ? 'BUY' : 'UPGRADE'} ( ${window.formatBalance(price)})
+                            ${lvl === 0 ? 'BUY' : 'UPGRADE'} (${window.formatBalance(price)})
                         </button>
                         ${lvl > 0 ? `<button class="btn-sell" onclick="confirmSell(${b.id})">SELL</button>` : ''}
                     </div>
                 </div>`;
             });
             container.innerHTML = html;
+
+            // Sync coins after render
+            updateCoinsLive();
         }
 
         window.handleAction = function(id, price, lvl) {
@@ -169,7 +214,7 @@
                         count: 1, 
                         buyPrice: price, 
                         totalInvested: price,
-                        income: bizData.income // Store base income for finance engine
+                        income: bizData.income
                     });
                 }
                 localStorage.setItem('vv_biz', JSON.stringify(myBiz));
@@ -207,7 +252,10 @@
             }, 4000);
         };
 
+        // Start everything
         render();
+        setInterval(updateCoinsLive, 1000);  // Live update har second
+        updateCoinsLive();  // Initial
     </script>
 </body>
 </html>
