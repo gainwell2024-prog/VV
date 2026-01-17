@@ -7,33 +7,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Kanit', sans-serif; }
+        body, html { 
+            height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Kanit', sans-serif; 
+        }
 
         .profile-container {
-            display: flex; flex-direction: column; height: 100vh; width: 100%;
-            padding-top: 70px; padding-bottom: 90px;
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 0.7)), url('dashboard-bg.png');
+            display: flex; flex-direction: column; 
+            height: 100dvh; width: 100%;
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 0.7)), url('bg.webp');
             background-size: cover; background-position: center;
+            position: relative;
         }
 
-        .scroll-view { flex: 1; overflow-y: auto; padding: 15px; scrollbar-width: none; }
-        .scroll-view::-webkit-scrollbar { display: none; }
+        /* FIXED HEADER SECTION */
+        .fixed-header-lock {
+            position: fixed; top: 70px; left: 0; width: 100%;
+            z-index: 1000; display: flex; flex-direction: column; align-items: center;
+            pointer-events: none;
+        }
 
         .profile-ad {
-            width: 92%; height: 45px; background: rgba(15, 23, 42, 0.85); 
+            width: 92%; max-width: 400px; height: 45px;
+            background: rgba(15, 23, 42, 0.95); 
             border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            color: #fbbf24; font-size: 0.65rem; font-weight: 800; margin: 0 auto 20px auto;
-            backdrop-filter: blur(10px);
+            color: #fbbf24; font-size: 0.65rem; font-weight: 800;
+            backdrop-filter: blur(10px); margin-bottom: 12px;
+            pointer-events: auto;
         }
 
-        .glass-box { 
-            background: rgba(15, 23, 42, 0.85); 
+        .identity-box-fixed {
+            width: 92%; background: rgba(15, 23, 42, 0.95); 
             border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.2);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-            margin-bottom: 20px;
-            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            pointer-events: auto;
         }
 
         .identity-card { display: flex; align-items: center; padding: 15px 20px; }
@@ -41,46 +48,59 @@
         .user-info { flex: 1; text-align: center; } 
         .user-info h2 { font-size: 1.5rem; color: #fff; font-weight: 900; letter-spacing: 1px; margin-left: -40px; }
 
+        /* SCROLLABLE AREA */
+        .scroll-view {
+            flex: 1; overflow-y: auto;
+            padding: 220px 15px 110px 15px; 
+            scrollbar-width: none;
+        }
+        .scroll-view::-webkit-scrollbar { display: none; }
+
+        .glass-box { 
+            background: rgba(15, 23, 42, 0.85); border-radius: 20px; 
+            border: 1px solid rgba(251, 191, 36, 0.2); backdrop-filter: blur(10px);
+            margin-bottom: 20px; overflow: hidden;
+        }
+
         .section-title { font-size: 0.6rem; color: #94a3b8; letter-spacing: 3px; margin: 25px 0 10px 5px; font-weight: 800; text-transform: uppercase; }
         
         .list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        .list-item:last-child { border: none; }
-
-        .item-label { display: flex; flex-direction: column; }
+        .item-label { display: flex; flex-direction: column; gap: 2px; } 
+        
         .label-main { font-size: 0.8rem; font-weight: 700; color: #fff; }
         .label-sub { font-size: 0.65rem; color: #fbbf24; font-weight: 800; }
 
-        .list-select { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); padding: 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 800; min-width: 130px; }
-
-        .confirm-btn { width: 100%; padding: 16px; background: #fbbf24; color: #020617; border: none; border-radius: 15px; font-weight: 900; font-size: 0.9rem; margin-top: 10px; letter-spacing: 1px; }
-        .reset-btn { width: 100%; padding: 12px; background: transparent; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 12px; font-weight: 700; font-size: 0.7rem; margin-top: 20px; margin-bottom: 40px; }
-
-        .lock-timer-box { 
-            text-align: center; color: #fbbf24; font-size: 0.7rem; font-weight: 800; 
-            background: rgba(251, 191, 36, 0.05); padding: 15px; border-radius: 15px; 
-            border: 1px dashed rgba(251, 191, 36, 0.4); margin-top: 10px;
+        /* FIXED SELECT BOX */
+        .list-select { 
+            background: #1e293b; color: #fbbf24; 
+            border: 1px solid rgba(251, 191, 36, 0.3); padding: 10px; 
+            border-radius: 10px; font-size: 0.75rem; font-weight: 800; 
+            min-width: 140px; appearance: none; -webkit-appearance: none;
         }
+        
+        .confirm-btn { width: 100%; padding: 16px; background: #fbbf24; color: #020617; border: none; border-radius: 15px; font-weight: 900; font-size: 0.9rem; margin-top: 10px; letter-spacing: 1px; }
+        .rep-val { font-size: 0.85rem; font-weight: 900; color: #fbbf24; }
+        .disabled-list { opacity: 0.6; pointer-events: none; }
+        .reset-btn { width: 100%; padding: 12px; background: transparent; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 12px; font-weight: 700; font-size: 0.7rem; margin-top: 20px; margin-bottom: 40px; }
 
         #confirmModal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 5000; padding: 20px; }
         .id-card { background: linear-gradient(145deg, #1e293b, #0f172a); width: 100%; max-width: 350px; border-radius: 35px; border: 2px solid #fbbf24; overflow: hidden; text-align: center; }
-        
-        .rep-val { font-size: 0.85rem; font-weight: 900; color: #fbbf24; }
-        .disabled-list { opacity: 0.6; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <div class="profile-container">
-        <div class="scroll-view">
+        <div class="fixed-header-lock">
             <div class="profile-ad">VIRTUAL VENTURES PREMIUM</div>
-
-            <div class="glass-box">
+            <div class="identity-box-fixed">
                 <div class="identity-card">
                     <div class="avatar-circle" id="userAvatar">👤</div>
                     <div class="user-info"><h2 id="userNameDisplay">INVESTOR</h2></div>
                 </div>
             </div>
+        </div>
 
+        <div class="scroll-view">
             <p class="section-title">Lifestyle Configuration</p>
             <div class="glass-box" id="configArea">
                 <div class="list-item">
@@ -103,230 +123,108 @@
 
             <p class="section-title">Financial Report</p>
             <div class="glass-box">
-                <div class="list-item"><span class="label-main">Total Assets (Net Worth)</span><span class="rep-val" id="totalAssets">0</span></div>
+                <div class="list-item"><span class="label-main">Total Assets</span><span class="rep-val" id="totalAssets">0</span></div>
                 <div class="list-item"><span class="label-main">Bank Balance</span><span class="rep-val" id="bankBalance">0</span></div>
-                <div class="list-item"><span class="label-main">Stock Holdings Value</span><span class="rep-val" id="stockValue">0</span></div>
+                <div class="list-item"><span class="label-main">Stock Value</span><span class="rep-val" id="stockValue">0</span></div>
                 <div class="list-item"><span class="label-main">Estate Value</span><span class="rep-val" id="estateValue">0</span></div>
             </div>
-
             <button class="reset-btn" onclick="resetGame()">RESET PROGRESS</button>
         </div>
     </div>
 
     <div id="confirmModal">
         <div class="id-card">
-            <div style="background:#fbbf24; padding:12px; color:black; font-weight:900; italic; letter-spacing:1px;">LIFESTYLE UPGRADE</div>
+            <div style="background:#fbbf24; padding:12px; color:black; font-weight:900;">LIFESTYLE UPGRADE</div>
             <div style="padding:30px;">
                 <div id="modalAv" style="font-size:4rem; margin-bottom:15px;">👤</div>
-                <h3 style="font-weight:900; font-size:1.4rem; margin-bottom:20px;">CONFIRM CHANGES?</h3>
-                <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:15px; text-align:left; font-size:0.75rem; margin-bottom:25px; border:1px solid rgba(255,255,255,0.05);">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span>Hourly Bill:</span><span id="modalBill" style="color:#fbbf24; font-weight:bold;">0</span></div>
-                    <div style="display:flex; justify-content:space-between;"><span>Energy Cap:</span><span id="modalEnergy" style="color:#60a5fa; font-weight:bold;">0</span></div>
+                <h3 style="font-weight:900; font-size:1.4rem;">CONFIRM CHANGES?</h3>
+                <div style="background:rgba(0,0,0,0.3); padding:15px; border-radius:15px; text-align:left; margin: 20px 0;">
+                    <div style="display:flex; justify-content:space-between;"><span>Hourly Bill:</span><span id="modalBill" style="color:#fbbf24;">0</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Energy Cap:</span><span id="modalEnergy" style="color:#60a5fa;">0</span></div>
                 </div>
-                <button onclick="applyChanges()" class="confirm-btn" style="margin:0;">START NEW LIFESTYLE</button>
-                <p onclick="closeConfirm()" style="margin-top:20px; font-size:0.65rem; color:#94a3b8; font-weight:bold; cursor:pointer; text-transform:uppercase;">Back to Edit</p>
+                <button onclick="applyChanges()" class="confirm-btn">START NEW LIFESTYLE</button>
+                <p onclick="closeConfirm()" style="margin-top:20px; cursor:pointer; color:#94a3b8;">BACK</p>
             </div>
         </div>
     </div>
 
     <script src="settings.js"></script>
     <script>
-        const diets = [
-            {n:"Vada Pav & Chai", c:10},
-            {n:"Home Cooked Thali", c:40},
-            {n:"Fast Food & Drinks", c:150},
-            {n:"Gourmet Dining", c:500},
-            {n:"Private Chef Service", c:2000}
-        ];
-
-        const livings = [
-            {n:"Shared Dormitory", c:20},
-            {n:"Co-Living Studio", c:150},
-            {n:"City Center Flat", c:800},
-            {n:"Luxury Penthouse", c:3500},
-            {n:"Private Mega Mansion", c:15000}
-        ];
-
-        const transports = [
-            {n:"Scooty", c:50, level:1},
-            {n:"Car", c:200, level:2},
-            {n:"Luxury Car", c:500, level:3},
-            {n:"Private Jet", c:2000, level:4}
-        ];
-
-        const energyMatrix = [
-            [500,550,600,650,700],
-            [600,750,800,850,900],
-            [700,850,1000,1100,1150],
-            [800,950,1150,1300,1400],
-            [900,1050,1250,1400,1500]
-        ];
+        const diets = [{n:"Vada Pav & Chai", c:10},{n:"Home Cooked Thali", c:40},{n:"Fast Food & Drinks", c:150},{n:"Gourmet Dining", c:500},{n:"Private Chef Service", c:2000}];
+        const livings = [{n:"Shared Dormitory", c:20},{n:"Co-Living Studio", c:150},{n:"City Center Flat", c:800},{n:"Luxury Penthouse", c:3500},{n:"Private Mega Mansion", c:15000}];
+        const transports = [{n:"Scooty", c:50, level:1},{n:"Car", c:200, level:2},{n:"Luxury Car", c:500, level:3},{n:"Private Jet", c:2000, level:4}];
+        const energyMatrix = [[500,550,600,650,700],[600,750,800,850,900],[700,850,1000,1100,1150],[800,950,1150,1300,1400],[900,1050,1250,1400,1500]];
 
         function init() {
             const dSel = document.getElementById('dietSelect');
             const lSel = document.getElementById('liveSelect');
             const tSel = document.getElementById('transSelect');
 
-            diets.forEach(x => dSel.innerHTML += `<option value="${x.c}">${x.n}</option>`);
-            livings.forEach(x => lSel.innerHTML += `<option value="${x.c}">${x.n}</option>`);
-
+            dSel.innerHTML = diets.map(x => `<option value="${x.c}">${x.n}</option>`).join('');
+            lSel.innerHTML = livings.map(x => `<option value="${x.c}">${x.n}</option>`).join('');
+            
             let currentTransCost = Number(localStorage.getItem('vv_trans_cost')) || 0;
-
             if (currentTransCost === 0) {
                 tSel.innerHTML = `<option value="0" selected>Walking (Default)</option>`;
             } else {
-                const matched = transports.find(t => t.c === currentTransCost);
-                if (matched) {
-                    transports.forEach(x => {
-                        tSel.innerHTML += `<option value="${x.c}" ${x.c === currentTransCost ? 'selected' : ''}>${x.n}</option>`;
-                    });
-                } else {
-                    tSel.innerHTML = `<option value="${currentTransCost}" selected>Premium Transport (Locked)</option>`;
-                }
+                tSel.innerHTML = transports.map(x => `<option value="${x.c}" ${x.c === currentTransCost ? 'selected' : ''}>${x.n}</option>`).join('');
             }
 
             dSel.value = localStorage.getItem('vv_diet_cost') || 10;
             lSel.value = localStorage.getItem('vv_live_cost') || 20;
-            tSel.value = currentTransCost;
-
+            
             document.getElementById('userNameDisplay').innerText = (localStorage.getItem('vv_name') || "INVESTOR").toUpperCase();
             document.getElementById('userAvatar').innerText = localStorage.getItem('vv_avatar') || "👤";
-
-            syncCosts();
-            updateFinancials(); // Initial financial update
-            checkLocks();
+            
+            syncCosts(); updateFinancials(); checkLocks();
         }
 
         function syncCosts() {
-            const d = parseInt(document.getElementById('dietSelect').value);
-            const l = parseInt(document.getElementById('liveSelect').value);
-            const t = parseInt(document.getElementById('transSelect').value);
-
-            document.getElementById('costDiet').innerText = `${d}/hr`;
-            document.getElementById('costLive').innerText = `${l}/hr`;
-            document.getElementById('costTrans').innerText = `${t}/hr`;
+            document.getElementById('costDiet').innerText = document.getElementById('dietSelect').value + "/hr";
+            document.getElementById('costLive').innerText = document.getElementById('liveSelect').value + "/hr";
+            document.getElementById('costTrans').innerText = document.getElementById('transSelect').value + "/hr";
         }
 
         function openConfirm() {
             const d = parseInt(document.getElementById('dietSelect').value);
             const l = parseInt(document.getElementById('liveSelect').value);
             const t = parseInt(document.getElementById('transSelect').value);
-
             const dIdx = diets.findIndex(x => x.c === d);
             const lIdx = livings.findIndex(x => x.c === l);
-            const energy = energyMatrix[dIdx][lIdx];
-
             document.getElementById('modalAv').innerText = localStorage.getItem('vv_avatar') || "👤";
             document.getElementById('modalBill').innerText = (d + l + t) + "/hr";
-            document.getElementById('modalEnergy').innerText = energy;
+            document.getElementById('modalEnergy').innerText = energyMatrix[dIdx][lIdx];
             document.getElementById('confirmModal').style.display = 'flex';
         }
 
-        function closeConfirm() { 
-            document.getElementById('confirmModal').style.display = 'none'; 
-        }
+        function closeConfirm() { document.getElementById('confirmModal').style.display = 'none'; }
 
         function applyChanges() {
             const d = parseInt(document.getElementById('dietSelect').value);
             const l = parseInt(document.getElementById('liveSelect').value);
             const t = parseInt(document.getElementById('transSelect').value);
-
-            const dIdx = diets.findIndex(x => x.c === d);
-            const lIdx = livings.findIndex(x => x.c === l);
-            const energy = energyMatrix[dIdx][lIdx];
-
             localStorage.setItem('vv_diet_cost', d);
             localStorage.setItem('vv_live_cost', l);
             localStorage.setItem('vv_trans_cost', t);
-            localStorage.setItem('vv_hourly_exp', (d + l + t));
-            localStorage.setItem('vv_max_energy', energy);
             localStorage.setItem('vv_profile_lock', Date.now());
-
-            const matchedDiet = diets.find(x => x.c === d);
-            if (matchedDiet) localStorage.setItem('vv_diet_name', matchedDiet.n);
-
-            closeConfirm();
-            checkLocks();
-            alert("Lifestyle updated! Locked for 1 hour.");
-            updateFinancials(); // Refresh financials after change
+            closeConfirm(); checkLocks();
         }
 
         function checkLocks() {
             const last = localStorage.getItem('vv_profile_lock');
-            const config = document.getElementById('configArea');
-            const actionArea = document.getElementById('actionArea');
-
-            if (last) {
-                const diff = Date.now() - Number(last);
-                if (diff < 3600000) {
-                    config.classList.add('disabled-list');
-                    const mins = Math.ceil((3600000 - diff) / 60000);
-                    actionArea.innerHTML = `<div class="lock-timer-box">🔒 SELECTION LOCKED<br><span style="font-size:1rem">${mins} MINS REMAINING</span></div>`;
-                    setTimeout(checkLocks, 30000);
-                    return;
-                }
+            if (last && (Date.now() - Number(last) < 3600000)) {
+                document.getElementById('configArea').classList.add('disabled-list');
+                document.getElementById('actionArea').innerHTML = `<div class="lock-timer-box">LOCKED</div>`;
             }
-            config.classList.remove('disabled-list');
-            actionArea.innerHTML = `<button id="saveBtn" class="confirm-btn" onclick="openConfirm()">CONFIRM & LOCK LIFESTYLE</button>`;
         }
 
-        // NEW: Calculate and Update Financial Report
         function updateFinancials() {
-            const port = JSON.parse(localStorage.getItem('vv_portfolio')) || {};
-            const myBiz = JSON.parse(localStorage.getItem('vv_biz')) || [];
-            const marketData = JSON.parse(localStorage.getItem('vv_master_market')) || { stocks: [], estate: [] };
-
-            // Bank Balance (dashboard balance)
-            const bankBalance = Number(localStorage.getItem('vv_balance')) || 0;
-
-            // Business Value (total invested in businesses + upgrades)
-            let businessValue = 0;
-            myBiz.forEach(biz => {
-                businessValue += (biz.totalInvested || 0);
-            });
-
-            // Stock Holdings Value (current price * qty)
-            let stockValue = 0;
-            Object.keys(port).forEach(key => {
-                if (key.startsWith('stk_')) {
-                    const asset = marketData.stocks.find(a => a.id === key);
-                    if (asset && port[key].qty > 0) {
-                        stockValue += port[key].qty * asset.price;
-                    }
-                }
-            });
-
-            // Estate Value (current price * qty)
-            let estateValue = 0;
-            Object.keys(port).forEach(key => {
-                if (key.startsWith('e')) {
-                    const asset = marketData.estate.find(a => a.id === key);
-                    if (asset && port[key].qty > 0) {
-                        estateValue += port[key].qty * asset.price;
-                    }
-                }
-            });
-
-            // Total Assets (Net Worth)
-            const totalAssets = bankBalance + businessValue + stockValue + estateValue;
-
-            // Update UI
-            document.getElementById('totalAssets').innerText = window.formatBalance(totalAssets);
-            document.getElementById('bankBalance').innerText = window.formatBalance(bankBalance);
-            document.getElementById('stockValue').innerText = window.formatBalance(stockValue);
-            document.getElementById('estateValue').innerText = window.formatBalance(estateValue);
+            const bal = Number(localStorage.getItem('vv_balance')) || 0;
+            document.getElementById('bankBalance').innerText = window.formatBalance ? window.formatBalance(bal) : bal;
+            document.getElementById('totalAssets').innerText = document.getElementById('bankBalance').innerText;
         }
 
-        // Run financials update every 5 seconds (live with market changes)
-        setInterval(updateFinancials, 5000);
-        updateFinancials(); // Initial
-
-        function resetGame() { 
-            if(confirm("DANGER: This will delete everything!")) { 
-                localStorage.clear(); 
-                window.location.href='index.html'; 
-            } 
-        }
+        function resetGame() { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } }
 
         window.onload = init;
     </script>

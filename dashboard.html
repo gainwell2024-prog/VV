@@ -9,26 +9,36 @@
         body, html { height: 100%; overflow: hidden; background: #020617; color: white; font-family: 'Inter', sans-serif; }
 
         .dashboard-container {
-            display: flex; flex-direction: column; height: 100vh; width: 100%;
-            /* BACKGROUND IMAGE */
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            width: 100%;
+            /* BACKGROUND FIX */
             background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.3), rgba(2, 6, 23, 0.7)), url('dashboard-bg.webp');
-            background-size: cover; background-position: center;
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
-        /* 1. AD BANNER (Adjusted Niche) */
+        /* 1. AD BANNER FIX (320x50) */
         .global-ad-banner {
-            width: 92%; height: 45px; background: rgba(15, 23, 42, 0.9); 
-            border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            color: #fbbf24; font-size: 0.6rem; font-weight: 800; 
-            margin: 65px auto 10px auto; /* Branding ke niche aur gap */
-            backdrop-filter: blur(10px); z-index: 100;
+            width: 320px; 
+            height: 50px; 
+            margin: 65px auto 10px auto; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            background: rgba(15, 23, 42, 0.7); 
+            border: 1px solid rgba(251, 191, 36, 0.3); 
+            border-radius: 8px;
+            z-index: 100;
+            overflow: hidden;
         }
 
-        /* 2. NETWORTH BOX (Background added) */
+        /* 2. NETWORTH BOX */
         .header-box { 
             width: 92%; margin: 0 auto; padding: 15px; text-align: center;
-            background: rgba(15, 23, 42, 0.85); /* Solid background for clarity */
+            background: rgba(15, 23, 42, 0.85);
             border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.2);
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
@@ -37,17 +47,14 @@
 
         /* 3. GAME AREA */
         .game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        
         #mainCoinBtn { font-size: 8rem; cursor: pointer; transition: 0.1s; user-select: none; }
         #mainCoinBtn:active { transform: scale(0.9); }
 
-        /* ENERGY BAR */
         .energy-wrap { width: 85%; margin-top: 20px; }
         .energy-bar-bg { width: 100%; height: 12px; background: rgba(0,0,0,0.6); border-radius: 30px; border: 1px solid rgba(251, 191, 36, 0.4); overflow: hidden; }
         .energy-fill { height: 100%; background: linear-gradient(90deg, #d97706, #fbbf24); width: 100%; transition: 0.3s ease; }
         .energy-stats { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; font-weight: 900; color: #fbbf24; }
 
-        /* 4. HUSTLE SECTION (Msg + Button) */
         .hustle-section { padding-bottom: 110px; text-align: center; }
         .hustle-msg { font-size: 0.65rem; color: #94a3b8; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         .side-hustle-btn {
@@ -63,10 +70,20 @@
 <body>
 
     <div class="dashboard-container">
-        <div class="global-ad-banner">SPONSOR SPACE</div>
-
+        <div class="global-ad-banner">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '51d05f01ffc3927eaa17005ae38320ca',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://www.highperformanceformat.com/51d05f01ffc3927eaa17005ae38320ca/invoke.js"></script>
+        </div>
         <div class="header-box">
-            <p class="nw-label">CASH BALANCE</p>
+            <p class="nw-label">BANK BALANCE</p>
             <div id="coinCountDisplay" class="nw-value">0</div>
         </div>
 
@@ -86,11 +103,7 @@
 
     <script src="settings.js"></script>
     <script>
-    function getMaxEnergy() {
-        return Number(localStorage.getItem('vv_max_energy')) || 500;
-    }
-
-    // Refill Rate half values for dashboard display
+    function getMaxEnergy() { return Number(localStorage.getItem('vv_max_energy')) || 500; }
     function getRefillRate() {
         const dietCost = Number(localStorage.getItem('vv_diet_cost')) || 10;
         const rates = { 10: 0.15, 40: 0.3, 150: 0.5, 500: 0.75, 2000: 1.25 };
@@ -104,31 +117,34 @@
     }
 
     function updateUI() {
-    let coins = Number(localStorage.getItem('vv_balance')) || 0;
-    let currentEnergy = Number(localStorage.getItem('vv_energy')) || 0;
-    const maxE = getMaxEnergy();
+        let coins = Number(localStorage.getItem('vv_balance')) || 0;
+        let currentEnergy = Number(localStorage.getItem('vv_energy')) || 0;
+        const maxE = getMaxEnergy();
 
-    if (currentEnergy < maxE) {
-        currentEnergy = Math.min(maxE, currentEnergy + (getRefillRate() * 0.5));
-        localStorage.setItem('vv_energy', currentEnergy);
+        if (currentEnergy < maxE) {
+            currentEnergy = Math.min(maxE, currentEnergy + (getRefillRate() * 0.5));
+            localStorage.setItem('vv_energy', currentEnergy);
+        }
+
+        // Global formatter fix
+        const display = document.getElementById('coinCountDisplay');
+        if (typeof window.formatBalance === 'function') {
+            display.innerText = window.formatBalance(coins);
+        } else {
+            display.innerText = formatBalance(coins);
+        }
+        
+        document.getElementById('energyFill').style.width = (currentEnergy / maxE) * 100 + "%";
+        document.getElementById('energyText').innerText = `${Math.floor(currentEnergy)} / ${maxE}`;
     }
-
-    // Naya global formatter use ho raha hai
-    document.getElementById('coinCountDisplay').innerText = window.formatBalance(coins);
-    document.getElementById('energyFill').style.width = (currentEnergy / maxE) * 100 + "%";
-    document.getElementById('energyText').innerText = `${Math.floor(currentEnergy)} / ${maxE}`;
-}
 
     function handleTap(e) {
         let energy = Number(localStorage.getItem('vv_energy')) || 0;
         if (energy < 1) return;
-        
         if(window.navigator.vibrate) window.navigator.vibrate(10);
         
         localStorage.setItem('vv_balance', (Number(localStorage.getItem('vv_balance')) || 0) + 1);
         localStorage.setItem('vv_energy', energy - 1);
-        
-        // Instant update on tap
         updateUI();
 
         const f = document.createElement('div'); f.className = 'tap-anim'; f.innerText = '+1';
@@ -144,6 +160,6 @@
 
     setInterval(updateUI, 1000); 
     updateUI();
-</script>
+    </script>
 </body>
 </html>
