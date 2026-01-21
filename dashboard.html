@@ -35,7 +35,7 @@
             overflow: hidden;
         }
 
-        /* 2. NETWORTH BOX */
+        /* 2. BANK BALANCE BOX */
             .biz-stats-box { width: 92%; background: rgba(15, 23, 42, 0.95); border: 1px solid #fbbf24; border-radius: 15px; margin: 0 auto 15px; padding: 12px; display: flex; justify-content: space-around; align-items: center; text-align: center; }
         .stat-item { flex: 1; }
         .stat-val { display: block; font-weight: 900; font-size: 1.1rem; color: #fbbf24; }
@@ -43,9 +43,9 @@
 
         /* Flash animation for coins update */
         @keyframes coinFlash {
-            0% { color: #fbbf24; transform: scale(1); }
-            50% { color: #4ade80; transform: scale(1.15); }
-            100% { color: #fbbf24; transform: scale(1); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
         }
         .coin-update { animation: coinFlash 0.6s ease; }
 
@@ -113,63 +113,91 @@
         return rates[dietCost] || 0.15;
     }
 
+    // 1. Formatting Function (Vahi purana)
+    // Aise likho taaki settings.js ya koi bhi file ise use kar sake
     function formatBalance(num) {
-        if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
-        if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
-        return Math.floor(num).toLocaleString();
+        let n = Number(num);
+        let sign = n < 0 ? "-" : ""; // Agar number minus hai toh sign save kar lo
+        n = Math.abs(n); // Number ko thodi der ke liye plus bana do calculation ke liye
+
+        if (n >= 1000000) {
+            return sign + (n / 1000000).toFixed(2) + 'M';
+        }
+        if (n >= 1000) {
+            return sign + (n / 1000).toFixed(1) + 'k';
+        }
+    
+       // Agar number chota hai toh commas ke saath dikhao
+        return sign + Math.floor(n).toLocaleString();
     }
 
-    function updateUI() {
-        let coins = Number(localStorage.getItem('vv_balance')) || 0;
-        let currentEnergy = Number(localStorage.getItem('vv_energy')) || 0;
-        const maxE = getMaxEnergy();
+    let lastBalance = Number(localStorage.getItem('vv_balance')) || 0;
 
-        if (currentEnergy < maxE) {
-            currentEnergy = Math.min(maxE, currentEnergy + (getRefillRate() * 0.5));
-            localStorage.setItem('vv_energy', currentEnergy);
+    function updateUI() {
+        let currentBalance = Number(localStorage.getItem('vv_balance')) || 0;
+        const balanceDisplay = document.getElementById('coinCountDisplay');
+        
+        let diff = currentBalance - lastBalance;
+
+        // Flash Logic
+        if (Math.abs(diff) > 0.01) {
+            balanceDisplay.classList.remove('coin-update');
+            void balanceDisplay.offsetWidth; // Restart animation trigger
+
+            if (diff > 0) {
+                balanceDisplay.style.color = "#4ade80"; // Green for Plus
+            } else {
+                balanceDisplay.style.color = "#ef4444"; // Red for Minus
+            }
+            
+            balanceDisplay.classList.add('coin-update');
+            
+            // 600ms baad wapas gold
+            setTimeout(() => {
+                balanceDisplay.style.color = "#fbbf24";
+            }, 600);
         }
 
-        // Naya function - hourly expense calculate karega
-    function updateHourlyExpense() {
-        // Profile se expenses le rahe hain (settings.js mein save hote hain)
+        lastBalance = currentBalance;
+
+        // Display Update with Formatting
+        // window.formatBalance use karo taaki formatting pakki ho jaye
+        balanceDisplay.innerText = window.formatBalance(currentBalance);
+        
+        // Expenses
         const diet = Number(localStorage.getItem('vv_diet_cost')) || 10;
         const living = Number(localStorage.getItem('vv_live_cost')) || 20;
         const transport = Number(localStorage.getItem('vv_trans_cost')) || 0;
-    
-        // Sab add kar do
-        const totalExpense = diet + living + transport;
-    
-        // Dashboard pe dikha do
-        document.getElementById('vv_hourly_exp').innerText = totalExpense + "/hr";
-        }
+        document.getElementById('vv_hourly_exp').innerText = formatBalance(diet + living + transport) + "/hr";
 
-        // Global formatter fix
-        const display = document.getElementById('coinCountDisplay');
-        if (typeof window.formatBalance === 'function') {
-            display.innerText = window.formatBalance(coins);
-        } else {
-            display.innerText = formatBalance(coins);
-        }
-        
+        // Energy
+        let currentEnergy = Number(localStorage.getItem('vv_energy')) || 0;
+        const maxE = getMaxEnergy(); 
         document.getElementById('energyFill').style.width = (currentEnergy / maxE) * 100 + "%";
         document.getElementById('energyText').innerText = `${Math.floor(currentEnergy)} / ${maxE}`;
-        updateHourlyExpense();
     }
 
     function handleTap(e) {
         let energy = Number(localStorage.getItem('vv_energy')) || 0;
         if (energy < 1) return;
+        
         if(window.navigator.vibrate) window.navigator.vibrate(10);
         
-        localStorage.setItem('vv_balance', (Number(localStorage.getItem('vv_balance')) || 0) + 1);
+        // Direct storage update
+        let newBalance = (Number(localStorage.getItem('vv_balance')) || 0) + 1;
+        localStorage.setItem('vv_balance', newBalance);
         localStorage.setItem('vv_energy', energy - 1);
+        
+        // Manual trigger for UI (Fast response)
         updateUI();
 
+        // Animation logic (+1 floating)
         const f = document.createElement('div'); f.className = 'tap-anim'; f.innerText = '+1';
         const x = e.touches ? e.touches[0].clientX : e.clientX;
         const y = e.touches ? e.touches[0].clientY : e.clientY;
         f.style.left = (x - 20) + 'px'; f.style.top = (y - 40) + 'px';
-        document.body.appendChild(f); setTimeout(() => f.remove(), 600);
+        document.body.appendChild(f); 
+        setTimeout(() => f.remove(), 600);
     }
 
     const btn = document.getElementById('mainCoinBtn');
