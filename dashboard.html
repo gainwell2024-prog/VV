@@ -36,14 +36,18 @@
         }
 
         /* 2. NETWORTH BOX */
-        .header-box { 
-            width: 92%; margin: 0 auto; padding: 15px; text-align: center;
-            background: rgba(15, 23, 42, 0.85);
-            border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.2);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            .biz-stats-box { width: 92%; background: rgba(15, 23, 42, 0.95); border: 1px solid #fbbf24; border-radius: 15px; margin: 0 auto 15px; padding: 12px; display: flex; justify-content: space-around; align-items: center; text-align: center; }
+        .stat-item { flex: 1; }
+        .stat-val { display: block; font-weight: 900; font-size: 1.1rem; color: #fbbf24; }
+        .stat-lbl { font-size: 0.6rem; color: #94a3b8; letter-spacing: 1px; }
+
+        /* Flash animation for coins update */
+        @keyframes coinFlash {
+            0% { color: #fbbf24; transform: scale(1); }
+            50% { color: #4ade80; transform: scale(1.15); }
+            100% { color: #fbbf24; transform: scale(1); }
         }
-        .nw-label { font-size: 0.6rem; color: #94a3b8; font-weight: 700; letter-spacing: 3px; margin-bottom: 2px; }
-        .nw-value { font-size: 2.8rem; font-weight: 900; color: #fbbf24; text-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
+        .coin-update { animation: coinFlash 0.6s ease; }
 
         /* 3. GAME AREA */
         .game-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -71,20 +75,19 @@
 
     <div class="dashboard-container">
         <div class="global-ad-banner">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '51d05f01ffc3927eaa17005ae38320ca',
-                    'format' : 'iframe',
-                    'height' : 50,
-                    'width' : 320,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://www.highperformanceformat.com/51d05f01ffc3927eaa17005ae38320ca/invoke.js"></script>
+            //place code here!//
         </div>
-        <div class="header-box">
-            <p class="nw-label">BANK BALANCE</p>
-            <div id="coinCountDisplay" class="nw-value">0</div>
+
+        <div class="biz-stats-box">
+            <div class="stat-item">
+                <span id="coinCountDisplay" class="stat-val">0</span>
+                <span class="stat-lbl">BANK BALANCE</span>
+            </div>
+            <div style="width: 1px; height: 30px; background: rgba(251,191,36,0.3);"></div>
+            <div class="stat-item">
+                <span id="vv_hourly_exp" class="stat-val">0/hr</span>
+                <span class="stat-lbl">HOURLY EXPENSE</span>
+            </div>
         </div>
 
         <div class="game-area">
@@ -126,6 +129,20 @@
             localStorage.setItem('vv_energy', currentEnergy);
         }
 
+        // Naya function - hourly expense calculate karega
+    function updateHourlyExpense() {
+        // Profile se expenses le rahe hain (settings.js mein save hote hain)
+        const diet = Number(localStorage.getItem('vv_diet_cost')) || 10;
+        const living = Number(localStorage.getItem('vv_live_cost')) || 20;
+        const transport = Number(localStorage.getItem('vv_trans_cost')) || 0;
+    
+        // Sab add kar do
+        const totalExpense = diet + living + transport;
+    
+        // Dashboard pe dikha do
+        document.getElementById('vv_hourly_exp').innerText = totalExpense + "/hr";
+        }
+
         // Global formatter fix
         const display = document.getElementById('coinCountDisplay');
         if (typeof window.formatBalance === 'function') {
@@ -136,6 +153,7 @@
         
         document.getElementById('energyFill').style.width = (currentEnergy / maxE) * 100 + "%";
         document.getElementById('energyText').innerText = `${Math.floor(currentEnergy)} / ${maxE}`;
+        updateHourlyExpense();
     }
 
     function handleTap(e) {

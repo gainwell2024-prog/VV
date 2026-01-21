@@ -1,8 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ35J78TDB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TZ35J78TDB');
+</script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Identity Setup | Virtual Ventures</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -12,7 +21,7 @@
         *::-webkit-scrollbar { display: none; }
 
         body { 
-            background: linear-gradient(rgba(2,6,23,0.1), rgba(2,6,23,0.25)), url('setup-bg.jpg'); 
+            background: linear-gradient(rgba(2,6,23,0.1), rgba(2,6,23,0.25)), url('setup-bg.webp'); 
             background-size: cover; background-position: center; background-attachment: fixed;
             color: white; font-family: 'Inter', sans-serif; height: 100dvh; overflow: hidden; padding: 20px;
         }
@@ -73,6 +82,7 @@
         <div class="mb-8 px-2">
             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest block text-center mb-2">Reserve Your Legacy Name</label>
             <input type="text" id="pName" class="w-full bg-black/50 border-b-2 border-yellow-500/50 rounded-xl p-4 outline-none focus:border-yellow-400 text-center font-black text-xl tracking-tighter" placeholder="YOUR NAME HERE">
+            <p id="errorBox" class="hidden text-red-500 text-[10px] font-bold text-center mt-2 uppercase"></p>
         </div>
 
         <div class="section-header" onclick="toggleSec('dietSec')">
@@ -80,11 +90,11 @@
             <i class="fas fa-chevron-down text-yellow-500"></i>
         </div>
         <div id="dietSec" class="section-content">
-            <div class="opt selected" onclick="pick(this, 'diet', 10)"><span>Vada Pav & Chai</span><span>10/hr</span></div>
-            <div class="opt" onclick="pick(this, 'diet', 40)"><span>Home Cooked Thali</span><span>40/hr</span></div>
-            <div class="opt" onclick="pick(this, 'diet', 150)"><span>Fast Food & Drinks</span><span>150/hr</span></div>
-            <div class="opt" onclick="pick(this, 'diet', 500)"><span>Gourmet Dining</span><span>500/hr</span></div>
-            <div class="opt" onclick="pick(this, 'diet', 2000)"><span>Private Chef Service</span><span>2k/hr</span></div>
+            <div class="opt selected" onclick="pick(this, 'diet', 10)"><span>Street Snacks</span><span>10/hr</span></div>
+            <div class="opt" onclick="pick(this, 'diet', 40)"><span>Home Meal</span><span>40/hr</span></div>
+            <div class="opt" onclick="pick(this, 'diet', 150)"><span>Restaurant</span><span>150/hr</span></div>
+            <div class="opt" onclick="pick(this, 'diet', 500)"><span>Organic Diet</span><span>500/hr</span></div>
+            <div class="opt" onclick="pick(this, 'diet', 2000)"><span>Executive Chef</span><span>2k/hr</span></div>
         </div>
 
         <div class="section-header" onclick="toggleSec('liveSec')">
@@ -92,10 +102,10 @@
             <i class="fas fa-chevron-down text-yellow-500"></i>
         </div>
         <div id="liveSec" class="section-content">
-            <div class="opt selected" onclick="pick(this, 'live', 20)"><span>Shared Dormitory</span><span>20/hr</span></div>
-            <div class="opt" onclick="pick(this, 'live', 150)"><span>Co-Living Studio</span><span>150/hr</span></div>
-            <div class="opt" onclick="pick(this, 'live', 800)"><span>City Center Flat</span><span>800/hr</span></div>
-            <div class="opt" onclick="pick(this, 'live', 3500)"><span>Luxury Penthouse</span><span>3.5k/hr</span></div>
+            <div class="opt selected" onclick="pick(this, 'live', 20)"><span>Micro-Pod</span><span>20/hr</span></div>
+            <div class="opt" onclick="pick(this, 'live', 150)"><span>Studio Apartment</span><span>150/hr</span></div>
+            <div class="opt" onclick="pick(this, 'live', 800)"><span>Suburban House</span><span>800/hr</span></div>
+            <div class="opt" onclick="pick(this, 'live', 3500)"><span>High-Rise Penthouse</span><span>3.5k/hr</span></div>
             <div class="opt" onclick="pick(this, 'live', 15000)"><span>Private Mega Mansion</span><span>15k/hr</span></div>
         </div>
 
@@ -110,7 +120,11 @@
             </div>
         </div>
 
-        <button onclick="showConfirmModal()" class="w-full bg-yellow-500 text-black font-black py-5 rounded-2xl mt-6 mb-12 uppercase tracking-[3px] shadow-lg active:scale-95 transition-all">Claim Identity</button>
+        <p class="text-[9px] text-gray-500 text-center mt-6 px-4 leading-relaxed">
+            By claiming identity, you agree to our Terms and allow Google Analytics to improve your gaming session.
+        </p>
+
+        <button onclick="showConfirmModal()" class="w-full bg-yellow-500 text-black font-black py-5 rounded-2xl mt-4 mb-12 uppercase tracking-[3px] shadow-lg active:scale-95 transition-all">Claim Identity</button>
     </div>
 
     <div id="confirmModal" class="modal-overlay">
@@ -134,7 +148,6 @@
         let avIdx = 0;
         let stats = { diet: 10, live: 20, avatar: '👦' };
 
-        // Energy Table Logic (max energy calculation)
         const dietMap = { 10: 0, 40: 1, 150: 2, 500: 3, 2000: 4 };
         const liveMap = { 20: 0, 150: 1, 800: 2, 3500: 3, 15000: 4 };
         const energyMatrix = [
@@ -152,6 +165,10 @@
         }
 
         function toggleSec(id) {
+            // Auto-close others
+            ['dietSec', 'liveSec'].forEach(sec => {
+                if(sec !== id) document.getElementById(sec).classList.remove('active');
+            });
             document.getElementById(id).classList.toggle('active');
         }
 
@@ -167,11 +184,22 @@
             el.classList.add('selected');
             stats[type] = cost;
             updateLiveStats();
+            
+            // AUTO-CLOSE on selection
+            setTimeout(() => {
+                el.parentElement.classList.remove('active');
+            }, 150);
         }
 
         function showConfirmModal() {
             let name = document.getElementById('pName').value.trim();
-            if(!name) return alert("Pehle naam toh likho bhai!");
+            let err = document.getElementById('errorBox');
+            if(!name) {
+                err.innerText = "Reserve your name first!";
+                err.classList.remove('hidden');
+                return;
+            }
+            err.classList.add('hidden');
             
             document.getElementById('modalName').innerText = name;
             document.getElementById('modalAv').innerText = stats.avatar;
@@ -186,27 +214,25 @@
 
         function finalSave() {
             let name = document.getElementById('pName').value.trim();
-            if (!name) return; // extra safety
+            if (!name) return;
 
             const energyCap = energyMatrix[dietMap[stats.diet]][liveMap[stats.live]];
 
-            // Save separate costs for future refill calculation
             localStorage.setItem('vv_name', name);
             localStorage.setItem('vv_avatar', stats.avatar);
-            localStorage.setItem('vv_diet_cost', stats.diet);       // ← NEW: separate diet
-            localStorage.setItem('vv_live_cost', stats.live);       // ← NEW: separate living
-            localStorage.setItem('vv_trans_cost', 0);               // ← NEW: default Walk (0)
-            localStorage.setItem('vv_trans_level', 0);              // ← NEW: level 0 = Walk
-            localStorage.setItem('vv_hourly_exp', stats.diet + stats.live + 0); // total for now
+            localStorage.setItem('vv_diet_cost', stats.diet);
+            localStorage.setItem('vv_live_cost', stats.live);
+            localStorage.setItem('vv_trans_cost', 0);
+            localStorage.setItem('vv_trans_level', 0);
+            localStorage.setItem('vv_hourly_exp', stats.diet + stats.live + 0);
 
             localStorage.setItem('vv_balance', 500);
             localStorage.setItem('vv_max_energy', energyCap);
             localStorage.setItem('vv_energy', energyCap);
             localStorage.setItem('vv_last_check', Date.now());
-            localStorage.setItem('vv_last_energy_check', Date.now()); // energy sync ke liye
+            localStorage.setItem('vv_last_energy_check', Date.now());
             localStorage.setItem('vv_checksum', btoa(500 + "VV_BOSS_786" + name));
 
-            // Settings defaults
             localStorage.setItem('vv_music', 'on');
             localStorage.setItem('vv_sound', 'on');
             localStorage.setItem('vv_setup_done', 'true');
@@ -214,7 +240,6 @@
             window.location.href = 'dashboard.html';
         }
 
-        // Initial call to show default stats
         updateLiveStats();
     </script>
 </body>

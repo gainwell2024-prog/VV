@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TZ35J78TDB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-TZ35J78TDB');
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Virtual Ventures</title>
@@ -59,7 +68,7 @@
             <p class="main-tagline">VIRTUAL ECONOMY, REAL FUN</p>
         </div>
         <div class="login-container">
-            <button id="startBtn" class="google-style-btn">START JOURNEY</button>
+            <button id="startBtn" class="google-style-btn">START VENTURE</button>
             <p class="dream-msg">"Every billionaire started with a single click."</p>
         </div>
     </div>
@@ -96,10 +105,14 @@
         }
 
         // --- BUTTON LOGIC ---
-        document.getElementById('startBtn').onclick = () => {
-            window.location.href = localStorage.getItem('vv_setup_done') === 'true' ? 'dashboard.html' : 'tutorial.html';
+        const startBtn = document.getElementById('startBtn');
+        const isSetupDone = localStorage.getItem('vv_setup_done') === 'true';
+        
+        startBtn.textContent = isSetupDone ? 'CONTINUE YOUR VENTURE' : 'START JOURNEY';
+        
+        startBtn.onclick = () => {
+            window.location.href = isSetupDone ? 'dashboard.html' : 'tutorial.html';
         };
     </script>
 </body>
-
 </html>
